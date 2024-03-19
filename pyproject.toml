@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "airogue"
+version = "0.1.0"
+description = ""
+authors = ["Tarolrr"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+openai = "^1.14.2"
+tcod = "^16.2.2"
+tcod-ecs = "^5.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
