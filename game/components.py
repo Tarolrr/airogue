@@ -42,3 +42,9 @@ class Graphic:
 
 Gold: Final = ("Gold", int)
 """Amount of gold."""
+
+Description: Final = ("Description", str)
+"""Description of an entity"""
+
+Name: Final = ("Name", str)
+"""Name of an entity"""

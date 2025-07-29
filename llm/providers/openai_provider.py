@@ -5,13 +5,13 @@ from openai import OpenAI
 from providers.generic_provider import GenericProvider
 
 class OpenAIProvider(GenericProvider):
-    def query(self, system_prompt, user_prompt=None, max_tokens=300):
+    def query(self, system_prompt, user_prompt, max_tokens=300):
         client = OpenAI()
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
-                # {"role": "user", "content": user_prompt},
+                {"role": "user", "content": user_prompt},
             ],
             max_tokens=max_tokens
         )

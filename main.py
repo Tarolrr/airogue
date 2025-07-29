@@ -32,4 +32,22 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    import json
+
+    # # Read the original world_model.json file
+    # with open('world_model.json', 'r') as file:
+    #     world_model_data = json.load(file)
+
+    # # Write the formatted data to a new file
+    # with open('formatted_world_model.json', 'w') as formatted_file:
+    #     json.dump(world_model_data, formatted_file, indent=4)
+    # def test_print(x):
+        # print(x)
+        # return {}
+
+    # from langchain_core.runnables import RunnableLambda
+    # from langchain_core.runnables.passthrough import identity
+    # run = {"test": identity} | RunnableLambda(test_print)
+    # run.invoke(None)
+    # exit()
     main()

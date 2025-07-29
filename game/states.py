@@ -9,8 +9,8 @@ import tcod.event
 from tcod.event import KeySym
 
 import g
-from game.components import Gold, Graphic, Position
-from game.tags import IsItem, IsPlayer
+from game.components import Gold, Graphic, Position, Name, Description
+from game.tags import IsItem, IsPlayer, OnMap
 
 DIRECTION_KEYS: Final = {
     # Arrow keys
@@ -51,21 +51,32 @@ class InGame:
     def on_event(self, event: tcod.event.Event) -> None:
         """Handle events for the in-game state."""
         (player,) = g.world.Q.all_of(tags=[IsPlayer])
+        (game_component,) = g.world.Q.all_of(components=[])  # TODO fix
         match event:
             case tcod.event.Quit():
                 raise SystemExit()
             case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
+                game_component.attributes["time"] += 1
+                game_component.signals["tick"].emit(game_component.attributes["time"])
+                # tcod.event
                 player.components[Position] += DIRECTION_KEYS[sym]
                 # Auto pickup gold
-                for gold in g.world.Q.all_of(components=[Gold], tags=[player.components[Position], IsItem]):
-                    player.components[Gold] += gold.components[Gold]
-                    text = f"Picked up {gold.components[Gold]}g, total: {player.components[Gold]}g"
+                found = False
+                for gold in g.world.Q.all_of(tags=[player.components[Position], IsItem, OnMap]):
+                    # player.components[Gold] += gold.components[Gold]
+                    text = f"Standing on {gold.components[Name]}: {gold.components[Description]}"
                     g.world[None].components[("Text", str)] = text
-                    gold.clear()
-
+                    found = True
+                
+                if not found:
+                    g.world[None].components[("Text", str)] = ""
+            case tcod.event.KeyDown(sym=sym) if sym == KeySym.l:
+                game_component.signals["key_pressed"].emit("action_1")
+            case tcod.event.KeyDown(sym=sym) if sym == KeySym.k:
+                game_component.signals["key_pressed"].emit("action_2")
     def on_draw(self, console: tcod.console.Console) -> None:
         """Draw the standard screen."""
-        for entity in g.world.Q.all_of(components=[Position, Graphic]):
+        for entity in g.world.Q.all_of(components=[Position, Graphic], tags=[OnMap]):
             pos = entity.components[Position]
             if not (0 <= pos.x < console.width and 0 <= pos.y < console.height):
                 continue
@@ -73,5 +84,5 @@ class InGame:
             console.rgb[["ch", "fg"]][pos.y, pos.x] = graphic.ch, graphic.fg
 
         if text := g.world[None].components.get(("Text", str)):
-            console.print(x=0, y=console.height - 1, string=text, fg=(255, 255, 255), bg=(0, 0, 0))
+            console.print_box(x=0, y=console.height - 5, width=console.width, height=5, string=text, fg=(255, 255, 255), bg=(0, 0, 0))
 

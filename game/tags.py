@@ -11,3 +11,6 @@ IsActor: Final = "IsActor"
 
 IsItem: Final = "IsItem"
 """Entity is an item."""
+
+OnMap: Final = "OnMap"
+"""Entity is on the map."""
