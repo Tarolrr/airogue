@@ -45,7 +45,6 @@ def new_world() -> Registry:
             entity.components[comp.name] = comp
         # entity.tags = {IsActor}
     world_model.print()
-    exit()
     # for _ in range(10):
     #     gold = world[object()]
     #     gold.components[Position] = Position(rng.randint(0, 20), rng.randint(0, 20))

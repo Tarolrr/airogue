@@ -2,7 +2,28 @@ from typing import Any, Dict, List, Union
 
 from colored import attr, fg
 
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
+
+
+# Missing models needed by test fixtures
+class GenerationContext(BaseModel):
+    """Context for LLM content generation"""
+    user_input: str
+    preferences: Dict[str, Any] = {}
+
+
+class Theme(BaseModel):
+    """Theme for world generation"""
+    name: str
+    description: str
+    mood: str = "neutral"
+
+
+class Plot(BaseModel):
+    """Plot/story for world generation"""
+    summary: str
+    objectives: List[str] = []
+    setting_details: str = ""
 
 
 class Item(BaseModel):
