@@ -62,7 +62,7 @@ class GameMechanics(BaseModel):
     mechanics: List[GameMechanic]
 
     def __str__(self):
-        return "- " + "\n- ".join(self.mechanics)
+        return "- " + "\n- ".join(str(m) for m in self.mechanics)
 
 
 class Themes(BaseModel):
@@ -97,7 +97,6 @@ class ComponentModel(BaseModel):
 
 
 class EntityModel(BaseModel):
-    name: str
     uid: Union[str, int, object] = Field(default_factory=object)
     components: List[ComponentModel] = []
 
@@ -109,7 +108,7 @@ class WorldModel(BaseModel):
     plot: str
     mechanics: GameMechanics
     items: Items
-    global_entities: List[EntityModel] = []
+    global_entities: Dict[str, EntityModel] = {}
 
     def to_string(self, enable_formatting=True):
         def fmt(s):

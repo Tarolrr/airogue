@@ -15,7 +15,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.runnables.passthrough import identity
 from langchain_openai import ChatOpenAI
-from models import GameMechanics, Items, Themes, WorldModel
+from .models import GameMechanics, Items, Themes, WorldModel
 # import logging
 # logging.getLogger("langchain").setLevel(logging.DEBUG)
 # logging.getLogger("httpcore").setLevel(logging.INFO)
@@ -35,16 +35,22 @@ class SelectRandomOutputParser(JsonOutputParser):
         return random.choice(list_)
 
 
-theme_parser = SelectRandomOutputParser(pydantic_object=Themes)
-item_parser = OutputFixingParser(parser=PydanticOutputParser(pydantic_object=Items), llm=ChatOpenAI)
-gm_parser = OutputFixingParser(parser=PydanticOutputParser(pydantic_object=GameMechanics), llm=ChatOpenAI)
-
-
 class World:
     def __init__(self, setting):
         self.setting = setting
         self.setting_details = ""
         self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=1)
+        print(self.llm)
+        # Initialize parsers inside the class (moved from module level)
+        self.theme_parser = SelectRandomOutputParser(pydantic_object=Themes)
+        self.item_parser = OutputFixingParser.from_llm(
+            llm=self.llm,  # Reuse the same LLM instance
+            parser=PydanticOutputParser(pydantic_object=Items)
+        )
+        self.gm_parser = OutputFixingParser.from_llm(
+            llm=self.llm,  # Reuse the same LLM instance
+            parser=PydanticOutputParser(pydantic_object=GameMechanics)
+        )
         self.prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", 
@@ -83,10 +89,10 @@ class World:
         themes_prompt = {
             "input": (
                 f"Generate different, \"orthogonal\" themes for a game."
-                f"\n{theme_parser.get_format_instructions()}"
+                f"\n{self.theme_parser.get_format_instructions()}"
             )
         }
-        chain = self.partial_chain | theme_parser
+        chain = self.partial_chain | self.theme_parser
         theme = chain.invoke(themes_prompt)
         return theme
 
@@ -136,11 +142,11 @@ class World:
                 f"{self.design_doc}\n\n"
                 f"Here's the game mechanic:\n"
                 f"{str(game_mechanic)}\n\n"
-                f"{item_parser.get_format_instructions()}"
+                f"{self.item_parser.get_format_instructions()}"
             )
         }
 
-        chain = self.partial_chain | item_parser
+        chain = self.partial_chain | self.item_parser
         return chain.invoke(items_prompt).items
 
     def generate_world(self):

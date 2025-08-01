@@ -1,7 +1,7 @@
 """Predefined slots. All the ganerated slots should ultimately use these."""
-from tags import OnMap
-import g
-from components import Position
+from game.tags import OnMap
+# TODO: Check what 'g' module is and properly import it if needed
+from game.components import Position
 
 
 def end_game():

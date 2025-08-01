@@ -8,7 +8,7 @@ from tcod.ecs import Registry
 from game.components import Gold, Graphic, Position, Name, Description
 from game.tags import IsActor, IsItem, IsPlayer, OnMap
 from llm.world import World, WorldModel
-from slots import set_value, change_value, end_game
+from game.slots import set_value, change_value, end_game
 
 
 def new_world() -> Registry:
@@ -36,12 +36,12 @@ def new_world() -> Registry:
     game_entity.components["main"].slots["change_value"] = change_value
     game_entity.components["main"].slots["end_game"] = end_game
 
-    for ent in world_model.global_entities:
-        if ent.name == "Game":
+    for name, entity in world_model.global_entities.items():
+        if name == "Game":
             continue
-        entity = world[ent.name]
+        entity = world[name]
         # entity.components = ent.components
-        for comp in ent.components:
+        for comp in entity.components:
             entity.components[comp.name] = comp
         # entity.tags = {IsActor}
     world_model.print()
