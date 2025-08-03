@@ -47,7 +47,7 @@ class ThemeGenerator(BaseGenerator):
             String containing the generated theme.
             
         GUARANTEES: 
-        - Theme is implementable in ASCII roguelike
+        - Theme is implementable in ASCII console
         - Theme has appropriate depth for short game experience
         
         CONSTRAINTS:
@@ -57,15 +57,15 @@ class ThemeGenerator(BaseGenerator):
         # Create the prompt template for a single theme
         prompt = self.create_prompt([
             ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to generate an engaging theme for a new roguelike game. "
+                "You are a creative game designer specializing in console ASCII games. "
+                "Your task is to generate an engaging theme for a new game. "
                 "Requirements to keep in mind:\n"
                 "1. The game uses 2D ASCII visuals only.\n"
                 "2. The theme should be implementable without complex graphics.\n"
                 "3. The theme should have enough depth for a short game experience (< 1 hour).\n"
                 "4. The theme should be original and engaging."),
             ("user", 
-                "Generate a unique theme for a roguelike game. " 
+                "Generate a unique theme for a console ASCII game. " 
                 "The theme should be concise but descriptive.\n"
                 + (f"User preferences to consider: {context}" if context else "") +
                 "\nRespond with just the theme text, no additional formatting or explanation.")
@@ -87,7 +87,7 @@ class ThemeGenerator(BaseGenerator):
             String containing the selected theme.
             
         GUARANTEES: 
-        - Theme is implementable in ASCII roguelike
+        - Theme is implementable in ASCII console
         - Theme has appropriate depth for short game experience
         
         CONSTRAINTS:
@@ -97,15 +97,15 @@ class ThemeGenerator(BaseGenerator):
         # Create the prompt template
         prompt = self.create_prompt([
             ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to generate engaging themes for a new roguelike game. "
+                "You are a creative game designer specializing in console ASCII games. "
+                "Your task is to generate engaging themes for a new game. "
                 "Requirements to keep in mind:\n"
                 "1. The game uses 2D ASCII visuals only.\n"
                 "2. The theme should be implementable without complex graphics.\n"
                 "3. The theme should have enough depth for a short game experience (< 1 hour).\n"
                 "4. The theme should be original and engaging."),
             ("user", 
-                "Generate 5 different, unique themes for a roguelike game. " 
+                "Generate 5 different, unique themes for a console ASCII game. " 
                 "Each theme should be distinct and orthogonal from the others. "
                 "Format your response as a valid JSON object with this structure:\n"
                 "{{\n"
@@ -124,7 +124,7 @@ class ThemeGenerator(BaseGenerator):
 if __name__ == "__main__":
     # Simple CLI interface for testing
     import argparse
-    parser = argparse.ArgumentParser(description="Generate themes for a roguelike game")
+    parser = argparse.ArgumentParser(description="Generate themes for a console ASCII game")
     parser.add_argument(
         "--single",
         action="store_true",

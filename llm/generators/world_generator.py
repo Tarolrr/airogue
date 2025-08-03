@@ -122,7 +122,7 @@ class WorldGenerator(BaseGenerator):
         
         return items
     
-    def generate(self) -> WorldModel:
+    def generate(self, context: Optional[str] = None) -> WorldModel:
         """
         Generate a complete game world.
         
@@ -130,7 +130,7 @@ class WorldGenerator(BaseGenerator):
             WorldModel object containing all generated content.
         """
         # Get a theme - select one from the generated themes
-        theme = self.theme_generator.generate()
+        theme = self.theme_generator.generate(context=context)
         
         # Generate title
         title = self.title_generator.generate(theme)
@@ -149,12 +149,12 @@ class WorldGenerator(BaseGenerator):
             theme=theme,
             title=title,
             plot=plot,
-            mechanics=mechanics,
-            items=items
+            mechanics={"mechanics": mechanics},
+            items={"items": items}
         )
 
 
-def main(api_key: Optional[str] = None):
+def main(api_key: Optional[str] = None, context: Optional[str] = None):
     """
     Run the world generator as a standalone tool.
     
@@ -163,7 +163,7 @@ def main(api_key: Optional[str] = None):
     """
     generator = WorldGenerator(api_key=api_key)
     print("Generating world...")
-    world = generator.generate()
+    world = generator.generate(context=context)
     
     # Print the generated world
     print("\n===== GENERATED WORLD =====\n")
@@ -177,7 +177,7 @@ def main(api_key: Optional[str] = None):
     
     print("\nItems:")
     for item in world.items.items:
-        print(f"- {item['name']} [{item['ascii_symbol']}]: {item['description']}")
+        print(f"- {item.name} [{item.ascii_symbol}]: {item.description}")
     
     return world
 
@@ -188,6 +188,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Generate a roguelike game world")
     parser.add_argument("--api-key", type=str, help="OpenAI API key (if not provided, will use OPENAI_API_KEY env var)")
+    parser.add_argument("--context", type=str, help="Context for the world generator")
     parser.add_argument("--output", type=str, help="Output file path for the generated world (JSON format)")
     args = parser.parse_args()
     
@@ -197,7 +198,7 @@ if __name__ == "__main__":
         print("Error: No OpenAI API key provided. Either set the OPENAI_API_KEY environment variable or use --api-key.")
         exit(1)
     
-    world = main(api_key)
+    world = main(api_key, args.context)
     
     # Save to file if output path specified
     if args.output:

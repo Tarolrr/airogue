@@ -61,28 +61,27 @@ class ItemGenerator(BaseGenerator):
         # Create the prompt template
         prompt = self.create_prompt([
             ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to generate balanced and engaging items for a new roguelike game. "
+                "You are a creative game designer specializing in console ASCII games. "
+                "Your task is to generate balanced and engaging items for a new game. "
                 "Requirements to keep in mind:\n"
                 "1. The game uses 2D ASCII visuals only.\n"
                 "2. Each item must be representable with a single ASCII character.\n"
                 "3. Items should be balanced and support the game mechanics.\n"
                 "4. Each item should be unique with clear functionality."),
             ("user", 
-                f"Generate items for a roguelike game with the following mechanics:\n\n{mechanics_text}\n\n"
+                f"Generate items for a game with the following mechanics:\n\n{mechanics_text}\n\n"
                 f"For each mechanic, create 1-3 items that support or enhance that mechanic. "
                 f"Format your response as a valid JSON object with this structure:\n"
-                "{\n"
+                "{{\n"
                 '  "items": [\n'
-                '    {"name": "Item Name", "symbol": "A", "description": "Item description", "mechanic": "Related Mechanic", "rarity": "common/uncommon/rare"}\n'
+                '    {{"name": "Item Name", "description": "Item description", "mechanic": "Related Mechanic", "ascii_symbol": "A", "rarity": "common/uncommon/rare"}}\n'
                 "  ]\n"
-                "}\n\n"
+                "}}\n\n"
                 "Ensure each item has:\n"
                 "1. A unique name\n"
                 "2. A single ASCII character as its symbol\n"
                 "3. A clear description of its function\n"
-                "4. Which mechanic it supports\n"
-                "5. An appropriate rarity (common, uncommon, or rare)")
+                "4. Which mechanic it supports\n")
         ])
         
         # Create chain with parser and execute

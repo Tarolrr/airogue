@@ -36,7 +36,7 @@ class PlotGenerator(BaseGenerator):
             
         GUARANTEES:
         - Plot complements theme and title
-        - Plot has proper narrative arc for roguelike
+        - Plot has proper narrative arc for game
         
         CONSTRAINTS:
         - ONLY generates plot, never themes/mechanics/items
@@ -46,15 +46,15 @@ class PlotGenerator(BaseGenerator):
         # Create the prompt template
         prompt = self.create_prompt([
             ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to generate engaging plots for a new roguelike game. "
+                "You are a creative game designer specializing in console ASCII games. "
+                "Your task is to generate engaging plots for a new game. "
                 "Requirements to keep in mind:\n"
-                "1. The game is a roguelike with a short playtime (< 1 hour).\n"
+                "1. The game is a game with a short playtime (< 1 hour).\n"
                 "2. The plot should have a clear goal and narrative arc suitable for the genre.\n"
                 "3. The plot should be linear - no complex branching narratives.\n"
                 "4. The plot should complement and enhance the provided theme and title."),
             ("user", 
-                f"Generate a plot for a roguelike game with title '{title}' and theme '{theme}'. "
+                f"Generate a plot for a game with title '{title}' and theme '{theme}'. "
                 f"The plot should be concise but engaging, and completable within a one-hour gameplay session. "
                 f"Focus on creating a compelling narrative that works well with the theme.")
         ])

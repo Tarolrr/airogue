@@ -43,11 +43,11 @@ class TitleGenerator(BaseGenerator):
         # Create the prompt template
         prompt = self.create_prompt([
             ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to generate an engaging title for a new roguelike game. "
+                "You are a creative game designer specializing in console ASCII games. "
+                "Your task is to generate an engaging title for a new game. "
                 "The title should be memorable, concise, and reflect the theme."),
             ("user", 
-                f"Generate a compelling title for a roguelike game with the following theme: '{theme}'. "
+                f"Generate a compelling title for a console ASCII game with the following theme: '{theme}'. "
                 f"The title should be catchy, appropriate for the genre, and reflect the theme without being too generic. "
                 f"Respond with just the title, nothing else.")
         ])

@@ -56,22 +56,22 @@ class MechanicsGenerator(BaseGenerator):
         # Create the prompt template
         prompt = self.create_prompt([
             ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to generate engaging game mechanics for a new roguelike game. "
+                "You are a creative game designer specializing in console ASCII games. "
+                "Your task is to generate engaging game mechanics for a new game. "
                 "Requirements to keep in mind:\n"
                 "1. The game uses 2D ASCII visuals only.\n"
                 "2. The game engine does not support sound.\n"
-                "3. All mechanics must be implementable in a terminal-based roguelike.\n"
+                "3. All mechanics must be implementable in a terminal-based game.\n"
                 "4. Each mechanic should be unique and contribute to gameplay depth."),
             ("user", 
-                f"Generate 2-3 detailed game mechanics for a minimalistic console roguelike game with the title '{title}' and theme '{theme}'. "
+                f"Generate 2-3 detailed game mechanics for a minimalistic console game with the title '{title}' and theme '{theme}'. "
                 f"The mechanics should align with this plot: '{plot}'. "
                 f"Format your response as a valid JSON object with this structure:\n"
-                "{\n"
+                "{{\n"
                 '  "mechanics": [\n'
-                '    {"name": "Mechanic Name", "description": "Detailed description of how the mechanic works", "rules": "Specific rules for this mechanic"}\n'
+                '    {{"name": "Mechanic Name", "description": "Detailed description of how the mechanic works", "rules": "Specific rules for this mechanic"}}\n'
                 "  ]\n"
-                "}")
+                "}}")
         ])
         
         # Create chain with parser and execute
