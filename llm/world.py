@@ -1,226 +1,118 @@
-import random
-from operator import itemgetter
+"""World generator wrapper for backward compatibility.
+
+This module wraps the new modular world generator for backward compatibility.
+It uses the same interface as the original World class but delegates to the
+WorldGenerator class for the actual generation logic.
+"""
+import os
+from typing import Any, Dict, List, Optional, Union
 
 from colored import attr, fg
-# from langchain.agents import Agent, AgentExecutor
-# from langchain.agents.chat.base import BasePromptTemplate
-# from langchain.agents.chat.output_parser import ChatOutputParser
-# from langchain.agents.output_parsers import SelfAskOutputParser
 
-from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
-# from langchain.chains.llm import LLMChain
-# from langchain_core.agents import AgentFinish, AgentAction
-from langchain_core.output_parsers import JsonOutputParser, NumberedListOutputParser, StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-from langchain_core.runnables.passthrough import identity
-from langchain_openai import ChatOpenAI
 from .models import GameMechanics, Items, Themes, WorldModel
-# import logging
-# logging.getLogger("langchain").setLevel(logging.DEBUG)
-# logging.getLogger("httpcore").setLevel(logging.INFO)
-# logging.getLogger("httpx").setLevel(logging.INFO)
-# import sys
-# logging.basicConfig(
-#     format="%(asctime)s %(levelname)s %(name)s %(message)s",
-#     datefmt="%Y-%m-%d %H:%M:%S",
-#     level=logging.DEBUG,
-#     stream=sys.stdout,
-# )
-
-
-class SelectRandomOutputParser(JsonOutputParser):
-    def parse_result(self, text: str) -> str:
-        list_ = super().parse_result(text)["themes"]
-        return random.choice(list_)
+from .generators.world_generator import WorldGenerator
 
 
 class World:
-    def __init__(self, setting):
+    """World generator class for backward compatibility.
+    
+    This class maintains the same interface as the original World class but
+    delegates to the WorldGenerator class for the actual generation logic.
+    """
+    
+    def __init__(self, setting: Any, api_key: Optional[str] = None):
+        """Initialize the World generator.
+        
+        Args:
+            setting: Game setting (maintained for backward compatibility).
+            api_key: Optional OpenAI API key. If None, uses OPENAI_API_KEY environment variable.
+        """
         self.setting = setting
         self.setting_details = ""
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=1)
-        print(self.llm)
-        # Initialize parsers inside the class (moved from module level)
-        self.theme_parser = SelectRandomOutputParser(pydantic_object=Themes)
-        self.item_parser = OutputFixingParser.from_llm(
-            llm=self.llm,  # Reuse the same LLM instance
-            parser=PydanticOutputParser(pydantic_object=Items)
-        )
-        self.gm_parser = OutputFixingParser.from_llm(
-            llm=self.llm,  # Reuse the same LLM instance
-            parser=PydanticOutputParser(pydantic_object=GameMechanics)
-        )
-        self.prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", 
-                    "You are professional game designer."
-                    "You're very creative and always trying to come up with unique solutions."
-                    "Avoid using cliche, game design stereotypes and expected solutions."
-                    "There are certain requirements that you should keep in mind at all times while designing the game:\n"
-                    "1. The genre is roguelike, singleplayer, minimalistic.\n"
-                    "2. The game uses 2D ASCII engine.\n"
-                    "3. The game engine does not support sound.\n"
-                    "4. The game is terminal-only (engine supports drawing environment with different symbols).\n"
-                    "5. The game experience should be short. No more than an hour."),
-                ("user", "{input}"),
-
-            ]
-        )
-        self.chain = (
-            {
-                "input": lambda x: x["input"]
-            }
-            | self.prompt
-            | self.llm
-            | StrOutputParser()
-        )
-
-        self.partial_chain = (
-            {
-                "input": lambda x: x["input"]
-            }
-            | self.prompt
-            | self.llm
-        )
         self.design_doc = ""
+        
+        # Create the actual generator
+        self.generator = WorldGenerator(api_key=api_key)
+        
+        # For logging purposes
+        if hasattr(self.generator.llm, "__str__"):
+            print(self.generator.llm)
 
-    def theme(self):
-        themes_prompt = {
-            "input": (
-                f"Generate different, \"orthogonal\" themes for a game."
-                f"\n{self.theme_parser.get_format_instructions()}"
-            )
-        }
-        chain = self.partial_chain | self.theme_parser
-        theme = chain.invoke(themes_prompt)
+    def theme(self) -> str:
+        """Generate a theme for the game.
+        
+        Returns:
+            A string representing the theme.
+        """
+        # Use the generator's theme generation functionality
+        themes_result = self.generator.generate_themes()
+        theme = themes_result["themes"][0] if isinstance(themes_result, dict) else themes_result
         return theme
-
-    def generate_title(self, theme):
-        title_prompt = {
-            "input": f"Generate a title for a game with the following theme {theme}."
-        }
-
-        title = self.chain.invoke(title_prompt)
+    
+    def generate_title(self, theme: str) -> str:
+        """Generate a title based on the theme.
+        
+        Args:
+            theme: The theme for the game.
+            
+        Returns:
+            A string representing the title.
+        """
+        title = self.generator.generate_title(theme)
         self.design_doc += f"Theme: {theme}\n"
         self.design_doc += f"Title: {title}\n"
         return title
-
-    def generate_plot(self, theme, title):
-        plot_prompt = {
-            "input": (
-                f"Generate a plot for a game with title {title} and the following overall theme: {theme}."
-            )
-        }
-        plot = self.chain.invoke(plot_prompt)
+    
+    def generate_plot(self, theme: str, title: str) -> str:
+        """Generate a plot based on the theme and title.
+        
+        Args:
+            theme: The theme for the game.
+            title: The title of the game.
+            
+        Returns:
+            A string representing the plot.
+        """
+        plot = self.generator.generate_plot(theme, title)
         self.design_doc += f"Plot: {plot}\n"
         return plot
-
-    def generate_game_mechanics(self, theme, title, plot):
-        game_mechanics_prompt = {
-            "input": (
-                f"Generate detailed game mechanics for a minimalistic console game with a title {title} and the following overall theme: {theme}. "
-                f"Main writer already wrote the plot for the game. "
-                f"Make sure that the game mechanics are strictly aligned with it. "
-                f"Make sure that the game mechanics are clear, concrete and specific.\n"
-                f"Here's the plot:\n{plot}\n"
-                f"\n{gm_parser.get_format_instructions()}"
-            )
-        }
-        chain = self.partial_chain | gm_parser
-        return chain.invoke(game_mechanics_prompt).mechanics
-
-    def generate_items(self, game_mechanic):
-        items_prompt = {
-            "input": (
-                "We're in the process of a game design. "
-                "You will be supplied with the design document and one of the game mechanics. "
-                "Your job is to come up with a list of 0 to 3 items that will be used in the game. "
-                "They should be strictly aligned with the game mechanic given. "
-                "If the game mechanic does not have anything to do with the items, give an empty list.\n"
-                "Here's the design document:\n"
-                f"{self.design_doc}\n\n"
-                f"Here's the game mechanic:\n"
-                f"{str(game_mechanic)}\n\n"
-                f"{self.item_parser.get_format_instructions()}"
-            )
-        }
-
-        chain = self.partial_chain | self.item_parser
-        return chain.invoke(items_prompt).items
-
-    def generate_world(self):
-        themes_prompt = {
-            "input": lambda x: (
-                f"Generate different, \"orthogonal\" themes for a game."
-                f"\n{theme_parser.get_format_instructions()}"
-            )
-        }
-
-        title_prompt = {
-            "input": "Generate a title for a game with the following theme {theme}."
-        }
-
-        plot_prompt = {
-            "input3": (
-                "Generate a plot for a game with title {title} and the following overall theme: {theme}."
-            )
-        }
-
-        game_mechanics_prompt = {
-            "input4": (
-                "Generate detailed game mechanics for a minimalistic console game with a title {title} and the following overall theme: {theme}. "
-                "Main writer already wrote the plot for the game. "
-                "Make sure that the game mechanics are strictly aligned with it. "
-                "Make sure that the game mechanics are clear, concrete and specific.\n"
-                "Here's the plot:\n{plot}\n"
-                # f"\n{gm_parser.get_format_instructions()}"
-            )
-        }
-
-        items_prompt = {
-            "input": (
-                "We're in the process of a game design. "
-                "You will be supplied with the design document and one of the game mechanics. "
-                "Your job is to come up with a list of 10 items that will be used in the game. "
-                "They should be strictly aligned with the game mechanics given. "
-                "If the game mechanic does not have anything to do with the items, give an empty list.\n"
-                "Here's the design document:\n"
-                "Theme: {theme}\n"
-                "Title: {title}\n"
-                "Plot: {plot}\n\n"
-                "Here are the game mechanics:\n"
-                "{mechanics}\n"
-                # f"\n{item_parser.get_format_instructions()}"
-            )
-        }
-
-        chain = (
-            themes_prompt | self.prompt | self.llm | theme_parser
-            | RunnableParallel(
-                theme=identity,
-                title={"input": lambda x: title_prompt["input"].format(theme=x)} | self.prompt | self.llm | StrOutputParser(),
-            )
-            | RunnableParallel(
-                theme=itemgetter("theme"),
-                title=itemgetter("title"),
-                plot={"input": lambda x: plot_prompt["input3"].format(**x)} | self.prompt | self.llm | StrOutputParser(),
-            )
-            | RunnableParallel(
-                theme=itemgetter("theme"),
-                title=itemgetter("title"),
-                plot=itemgetter("plot"),
-                mechanics={"input": lambda x: game_mechanics_prompt["input4"].format(**x) + "\n" + gm_parser.get_format_instructions()} | self.prompt | self.llm | gm_parser,
-            )
-            | RunnableParallel(
-                theme=itemgetter("theme"),
-                title=itemgetter("title"),
-                plot=itemgetter("plot"),
-                mechanics=itemgetter("mechanics"),
-                items={"input": lambda x: items_prompt["input"].format(**(x | {"mechanics": str(x["mechanics"])})) + "\n" + item_parser.get_format_instructions()} | self.prompt | self.llm | item_parser,
-            )
-        )
-        return WorldModel(**chain.invoke(None))
+    
+    def generate_game_mechanics(self, theme: str, title: str, plot: str) -> List[Dict[str, str]]:
+        """Generate game mechanics based on the theme, title, and plot.
+        
+        Args:
+            theme: The theme for the game.
+            title: The title of the game.
+            plot: The plot of the game.
+            
+        Returns:
+            A list of game mechanics.
+        """
+        return self.generator.generate_game_mechanics(theme, title, plot)
+    
+    def generate_items(self, game_mechanic: Union[Dict[str, str], GameMechanics]) -> List[Dict[str, Any]]:
+        """Generate items based on a game mechanic.
+        
+        Args:
+            game_mechanic: A game mechanic object or dictionary.
+            
+        Returns:
+            A list of items.
+        """
+        # Convert dictionary to GameMechanics object if necessary
+        if isinstance(game_mechanic, dict):
+            game_mechanic = GameMechanics(mechanics=[game_mechanic])
+            
+        return self.generator.generate_items(game_mechanic)
+    
+    def generate_world(self) -> WorldModel:
+        """Generate a complete world model.
+        
+        Returns:
+            A WorldModel object containing the generated world.
+        """
+        # Directly delegate to the generator
+        return self.generator.generate()
 
     def print_world(self, theme, title, plot, mechanics, items):
         print(fg("green") + attr("bold") + "Theme: " + attr("reset"), end="")
@@ -257,68 +149,69 @@ class World:
         # print(fg("cyan") + "  - ", end="")
         # print(fg("blue") + str(item))
 
+# Simple command-line interface if run directly
 if __name__ == "__main__":
-    world = World(None)
-    # from langchain_core.output_parsers import ListOutputParser
-    # print(ListOutputParser().parse('["a", "b", "c"]'))
-    # exit(0)
-    from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-    name_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", "Return a single name and surname pair. Nothing else"),
-        ]
-    )
+    import sys
+    import argparse
+    import dotenv
     
-    job_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", "Write {name} in cyrillic. Nothing else"),
-        ]
-    )
-
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=1)
-    chain1 = (
-        {} 
-        | name_prompt
-        | llm
-        | StrOutputParser()
-
-    )
-    # name = chain1.invoke(None)
-    # print(name)
-    chain2 = (
-        chain1
-        | RunnableParallel(
-            name=RunnablePassthrough(),
-            job={"name": lambda x: x} | job_prompt | llm | StrOutputParser()
-        )
-        | (lambda x: f"{x['name']} - {x['job']}")
-    )
-
-    # job = chain2.invoke({"name": name})
-    # job = chain2.invoke(None)
-    # print(job)
-    # exit(0)
-    import json
-    with open('../world_model.json', 'r') as f:
-        world_model = WorldModel(**json.load(f))
-
-    # world_model = world.generate_world()
-    # print(world_model)
-    # with open('world_model.json', 'w') as f:
-    #     f.write(world_model.json())
-    # exit(0)
+    # First try to load .env files
+    if os.path.exists(".env"):
+        dotenv.load_dotenv()
+        
+    home_env = os.path.join(os.path.expanduser("~"), ".airogue.env")
+    if os.path.exists(home_env):
+        dotenv.load_dotenv(home_env)
+        
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="Generate a roguelike game world")
+    parser.add_argument("--api-key", type=str, help="OpenAI API key (if not provided, will use OPENAI_API_KEY env var)")
+    parser.add_argument("--env-file", type=str, help="Path to .env file with OPENAI_API_KEY")
+    args = parser.parse_args()
+    
+    # Load from specific env file if provided
+    if args.env_file and os.path.exists(args.env_file):
+        dotenv.load_dotenv(args.env_file)
+        
+    # Get API key
+    api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
+    
+    if not api_key:
+        print("Error: No OpenAI API key provided. Use one of these methods:")
+        print("1. Set the OPENAI_API_KEY environment variable")
+        print("2. Create a .env file with OPENAI_API_KEY=your-key")
+        print("3. Create a ~/.airogue.env file with OPENAI_API_KEY=your-key")
+        print("4. Use the --api-key command line argument")
+        print("5. Specify a custom .env file with --env-file")
+        sys.exit(1)
+        
+    # Initialize the world with the API key
+    world = World(None, api_key=api_key)
+    
+    # Generate content step by step
     theme = world.theme()
-    print(theme)
+    print(f"Theme: {theme}")
+    
     title = world.generate_title(theme)
-    print(title)
+    print(f"Title: {title}")
+    
     plot = world.generate_plot(theme, title)
-    print(plot)
+    print(f"Plot: {plot}")
+    
     game_mechanics = world.generate_game_mechanics(theme, title, plot)
-    print(game_mechanics)
-    exit(0)
+    print("Game Mechanics:")
+    for mechanic in game_mechanics:
+        print(f"- {mechanic}")
+        
+    # Generate items for each game mechanic
     total_items = []
-    for line in game_mechanics:
-        items = world.generate_items(line)
-        total_items += items
-
+    for mechanic in game_mechanics:
+        items = world.generate_items(mechanic)
+        total_items.extend(items)
+        
+    print("Items:")
+    for item in total_items:
+        print(f"- {item['name']} [{item['ascii_symbol']}]: {item['description']}")
+        
+    # Print the complete world
     world.print_world(theme, title, plot, game_mechanics, total_items)

@@ -19,9 +19,126 @@ For each module, we define:
 
 ## `llm/` Module Contracts
 
+### `llm/generators/world_generator.py`
+**Purpose**: Generate all world content using LLM (themes, plots, mechanics, items)
+**Status**: ✅ Implemented
+
+```python
+# CONTRACT
+class WorldGenerator:
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo", temperature: float = 1.0):
+        """
+        INPUT CONTRACT:
+        - api_key: Optional OpenAI API key
+        - model: LLM model to use
+        - temperature: Float between 0.0 and 2.0
+        
+        GUARANTEES:
+        - Initializes LLM client lazily (only when needed)
+        - Handles API key management
+        - Creates parsers for different content types
+        
+        CONSTRAINTS:
+        - Does not make API calls during initialization
+        """
+    
+    def generate_themes(self, context: Optional[Dict[str, Any]] = None) -> Dict[str, List[str]]:
+        """
+        INPUT CONTRACT:
+        - context: Optional dictionary with generation context
+        
+        OUTPUT CONTRACT:
+        - Returns: Dictionary with 'themes' key containing list of theme strings
+        - Each theme is a coherent game theme
+        
+        GUARANTEES:
+        - Always returns at least one theme
+        - Validates output before returning
+        
+        CONSTRAINTS:
+        - ONLY generates themes
+        - Does not modify global state
+        - Thread-safe
+        """
+    
+    def generate_title(self, theme: str) -> str:
+        """
+        INPUT CONTRACT:
+        - theme: Non-empty string representing the game theme
+        
+        OUTPUT CONTRACT:
+        - Returns: String containing the game title
+        
+        GUARANTEES:
+        - Title is consistent with provided theme
+        - Always returns a non-empty string
+        
+        CONSTRAINTS:
+        - ONLY generates a title based on theme
+        """
+
+    def generate_plot(self, theme: str, title: str) -> Dict[str, Any]:
+        """
+        INPUT CONTRACT:
+        - theme: Non-empty string representing the game theme
+        - title: Non-empty string representing the game title
+        
+        OUTPUT CONTRACT:
+        - Returns: Dictionary with plot details
+        - Contains 'setting', 'plot_summary', 'core_mechanics' keys
+        
+        GUARANTEES:
+        - Plot is consistent with provided theme and title
+        - Always returns a valid dictionary
+        
+        CONSTRAINTS:
+        - ONLY generates plot based on theme and title
+        """
+        
+    def generate_mechanics(self, theme: str, setting: str, plot: str) -> List[Dict[str, Any]]:
+        """
+        INPUT CONTRACT:
+        - theme: Non-empty string representing the game theme
+        - setting: Non-empty string representing the game setting
+        - plot: Non-empty string representing the plot summary
+        
+        OUTPUT CONTRACT:
+        - Returns: List of dictionaries representing game mechanics
+        - Each mechanic has 'name', 'description', and 'rules' keys
+        
+        GUARANTEES:
+        - Mechanics are consistent with theme, setting, and plot
+        - No duplicate mechanics
+        - All mechanics are implementable in ASCII roguelike
+        
+        CONSTRAINTS:
+        - Max number of mechanics limited for game balance
+        - No mechanics requiring sound (engine limitation)
+        """
+
+    def generate_items(self, mechanics: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        INPUT CONTRACT:
+        - mechanics: List of dictionaries representing game mechanics
+        
+        OUTPUT CONTRACT:
+        - Returns: Dictionary with 'items' key containing a list of item dictionaries
+        - Each item has 'name', 'description', 'mechanics_link' keys
+        
+        GUARANTEES:
+        - Items are balanced for the given mechanics
+        - Items have valid ASCII symbols
+        - No duplicate items
+        
+        CONSTRAINTS:
+        - Items must be representable in ASCII
+        - Items must support at least one mechanic
+        """
+```
+
 ### `llm/generators/theme_generator.py`
 **Purpose**: Generate game themes using LLM
-**Status**: 🔄 To be implemented
+**Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
@@ -52,7 +169,7 @@ class ThemeGenerator:
 
 ### `llm/generators/plot_generator.py`
 **Purpose**: Generate game plots based on theme
-**Status**: 🔄 To be implemented
+**Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
@@ -82,7 +199,7 @@ class PlotGenerator:
 
 ### `llm/generators/mechanics_generator.py`
 **Purpose**: Generate game mechanics based on theme and plot
-**Status**: 🔄 To be implemented
+**Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
@@ -113,7 +230,7 @@ class MechanicsGenerator:
 
 ### `llm/generators/item_generator.py`
 **Purpose**: Generate items for specific game mechanics
-**Status**: 🔄 To be implemented
+**Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
@@ -139,6 +256,68 @@ class ItemGenerator:
         - Max 5 items per mechanic call
         - Items must be representable in ASCII
         """
+```
+
+### `llm/generators/base.py`
+**Purpose**: Provide base generator functionality and LLM initialization
+**Status**: ✅ Implemented
+
+```python
+# CONTRACT
+class BaseGenerator(ABC):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo", temperature: float = 1.0):
+        """
+        INPUT CONTRACT:
+        - api_key: Optional OpenAI API key
+        - model: LLM model to use
+        - temperature: Float between 0.0 and 2.0
+        
+        GUARANTEES:
+        - Initializes LLM client lazily (only when needed)
+        - Handles API key management
+        
+        CONSTRAINTS:
+        - Does not make API calls during initialization
+        - Abstract base class, not to be used directly
+        """
+        
+    @property
+    def llm(self):
+        """
+        OUTPUT CONTRACT:
+        - Returns: Initialized LLM client
+        
+        GUARANTEES:
+        - Lazy initialization - only creates client when accessed
+        - Handles API key management
+        
+        CONSTRAINTS:
+        - May raise exceptions if API key is invalid or missing
+        """
+```
+
+### `llm/generators/cli.py`
+**Purpose**: Provide command-line interface for running generators
+**Status**: ✅ Implemented
+
+```python
+# CONTRACT
+def main():
+    """
+    INPUT CONTRACT:
+    - Command line arguments
+    
+    OUTPUT CONTRACT:
+    - Generates world content based on arguments
+    - Outputs content to console or file
+    
+    GUARANTEES:
+    - Provides help text and argument handling
+    - Creates WorldGenerator with appropriate settings
+    
+    CONSTRAINTS:
+    - Command-line tool only, not for import
+    """
 ```
 
 ---

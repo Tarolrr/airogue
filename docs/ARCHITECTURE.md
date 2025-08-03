@@ -15,7 +15,6 @@ AiRogue is a roguelike game that uses Large Language Models (LLMs) to dynamicall
 AiRogue/
 ├── main.py                 # Entry point, TCOD setup
 ├── g.py                   # Global state (minimal)
-├── config/                # Immutable game rules
 ├── game/                  # Game engine components
 │   ├── states.py         # Game state management
 │   ├── components.py     # ECS components
@@ -24,9 +23,12 @@ AiRogue/
 │   └── world_tools.py   # World-to-game bridge
 ├── llm/                  # LLM content generation
 │   ├── generators/      # Focused content generators
-│   ├── parsers/         # Output parsing
-│   ├── validators/      # Content validation
-│   └── orchestrator.py  # Generation coordination
+│   │   ├── base.py     # Base generator class
+│   │   ├── world_generator.py # World content generator
+│   │   └── cli.py      # Command-line interface for generators
+│   ├── models.py       # Pydantic data models
+│   ├── world.py        # Backward-compatible world generator
+│   └── providers/      # LLM provider implementations
 ├── utils/               # Shared utilities
 ├── tests/              # Comprehensive test suite
 └── docs/               # Documentation
@@ -54,13 +56,21 @@ AiRogue/
 - **Key Principle**: Each generator is independent and testable
 - **LLM Safety**: Always validate LLM outputs before use
 
+### `llm/generators/`
+- **Purpose**: Modular, focused content generators
+- **Key Files**:
+  - `base.py`: Base generator class with LLM initialization
+  - `world_generator.py`: World generation (theme, plot, mechanics, items)
+  - `cli.py`: Command-line tools for running generators independently
+- **LLM Safety**: All generators follow the same pattern and validation
+<!-- 
 ### `config/`
 - **Purpose**: Immutable game rules and constants
-- **LLM Safety**: 🚫 **NEVER MODIFY** - These define core game behavior
+- **LLM Safety**: 🚫 **NEVER MODIFY** - These define core game behavior -->
 
 ## Data Flow
 
-1. **World Generation**: `llm/orchestrator.py` coordinates content generation
+1. **World Generation**: `llm/generators/world_generator.py` handles content generation
 2. **Content Validation**: Each piece of content is validated before use
 3. **Game Integration**: `game/world_tools.py` converts LLM content to game entities
 4. **Rendering**: TCOD renders the game world

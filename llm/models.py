@@ -66,7 +66,7 @@ class GameMechanics(BaseModel):
 
 
 class Themes(BaseModel):
-    themes: List[str] = Field(min_items=10, max_items=10)
+    themes: List[str] = Field(min_length=10, max_length=10)
 
 
 class Action(BaseModel):
