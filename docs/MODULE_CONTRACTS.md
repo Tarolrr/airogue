@@ -131,99 +131,71 @@ class WorldGenerator:
         - No duplicate items
         
         CONSTRAINTS:
+        - ONLY generates items for mechanics
+        - 1-5 items per mechanic
         - Items must be representable in ASCII
-        - Items must support at least one mechanic
         """
 ```
 
 ### `llm/generators/theme_generator.py`
-**Purpose**: Generate game themes using LLM
+**Purpose**: Generate game theme
 **Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
 class ThemeGenerator:
-    def generate(self, context: GenerationContext) -> Theme:
-        """
-        INPUT CONTRACT:
-        - context: GenerationContext with user preferences
-        - context.user_input: Optional string with user theme preference
+    def generate(self, context: Optional[Dict[str, Any]] = None) -> str:
+        """Generate theme based on optional context.
         
-        OUTPUT CONTRACT:
-        - Returns: Theme object (see llm/models.py)
-        - Theme.name: Non-empty string, max 50 chars
-        - Theme.description: Non-empty string, max 200 chars
-        - Theme.mood: One of ["dark", "light", "neutral"]
-        
-        GUARANTEES:
-        - Always returns valid Theme object
-        - Never returns None
-        - Validates output before returning
+        GUARANTEES: 
+        - Theme is implementable in ASCII roguelike
+        - Theme has appropriate depth for short game experience
         
         CONSTRAINTS:
-        - ONLY generates themes, never plots/mechanics/items
-        - Does not modify global state
-        - Thread-safe
+        - ONLY generates theme, never plots/mechanics/items
+        - No themes requiring complex graphics
         """
 ```
 
 ### `llm/generators/plot_generator.py`
-**Purpose**: Generate game plots based on theme
+**Purpose**: Generate game plot based on theme
 **Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
 class PlotGenerator:
-    def generate(self, theme: Theme, context: GenerationContext) -> Plot:
-        """
-        INPUT CONTRACT:
-        - theme: Valid Theme object from ThemeGenerator
-        - context: GenerationContext with additional preferences
-        
-        OUTPUT CONTRACT:
-        - Returns: Plot object (see llm/models.py)
-        - Plot.summary: Non-empty string, max 300 chars
-        - Plot.objectives: List of 1-3 objective strings
-        - Plot.setting_details: Non-empty string, max 500 chars
+    def generate(self, theme: str, title: str) -> str:
+        """Generate plot based on theme and title.
         
         GUARANTEES:
-        - Plot is consistent with provided theme
-        - Always returns valid Plot object
-        - Validates theme input
+        - Plot complements theme and title
+        - Plot has proper narrative arc for roguelike
         
         CONSTRAINTS:
-        - ONLY generates plots, never themes/mechanics/items
-        - Must use provided theme, not generate new one
+        - ONLY generates plot, never themes/mechanics/items
+        - Plot must be completable in < 1 hour gameplay
+        - No complex branching narratives (engine limitation)
         """
 ```
 
 ### `llm/generators/mechanics_generator.py`
-**Purpose**: Generate game mechanics based on theme and plot
+**Purpose**: Generate gameplay mechanics based on theme and plot
 **Status**: 🔄 Future implementation (currently part of WorldGenerator)
 
 ```python
 # CONTRACT
 class MechanicsGenerator:
-    def generate(self, theme: Theme, plot: Plot, context: GenerationContext) -> List[GameMechanic]:
-        """
-        INPUT CONTRACT:
-        - theme: Valid Theme object
-        - plot: Valid Plot object
-        - context: GenerationContext
-        
-        OUTPUT CONTRACT:
-        - Returns: List of GameMechanic objects
-        - Length: 3-7 mechanics
-        - Each mechanic has valid name, description, rules
+    def generate(self, theme: str, title: str, plot: str) -> List[Dict[str, str]]:
+        """Generate gameplay mechanics based on theme, title and plot.
         
         GUARANTEES:
         - Mechanics are consistent with theme and plot
         - No duplicate mechanics
-        - All mechanics are implementable in ASCII roguelike
+        - All implementable in ASCII roguelike
         
         CONSTRAINTS:
         - ONLY generates mechanics, never themes/plots/items
-        - Max 7 mechanics (game balance requirement)
+        - 2-7 mechanics (game balance requirement)
         - No mechanics requiring sound (engine limitation)
         """
 ```
@@ -235,25 +207,17 @@ class MechanicsGenerator:
 ```python
 # CONTRACT
 class ItemGenerator:
-    def generate(self, mechanic: GameMechanic, context: GenerationContext) -> List[Item]:
-        """
-        INPUT CONTRACT:
-        - mechanic: Valid GameMechanic object
-        - context: GenerationContext
-        
-        OUTPUT CONTRACT:
-        - Returns: List of Item objects
-        - Length: 1-5 items per mechanic
-        - Each item supports the given mechanic
+    def generate(self, mechanics: List[Dict[str, str]]) -> List[Dict[str, Any]]:
+        """Generate items supporting the provided mechanics.
         
         GUARANTEES:
-        - Items are balanced for the mechanic
+        - Items are balanced for mechanics
         - Items have valid ASCII symbols
-        - No duplicate items within mechanic
+        - No duplicate items
         
         CONSTRAINTS:
-        - ONLY generates items for ONE mechanic
-        - Max 5 items per mechanic call
+        - ONLY generates items for mechanics
+        - 1-5 items per mechanic
         - Items must be representable in ASCII
         """
 ```
@@ -265,34 +229,24 @@ class ItemGenerator:
 ```python
 # CONTRACT
 class BaseGenerator(ABC):
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo", temperature: float = 1.0):
-        """
-        INPUT CONTRACT:
-        - api_key: Optional OpenAI API key
-        - model: LLM model to use
-        - temperature: Float between 0.0 and 2.0
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
+        """Initialize generator with LLM settings.
         
         GUARANTEES:
-        - Initializes LLM client lazily (only when needed)
-        - Handles API key management
+        - Safe API key handling
+        - Consistent LLM interface
         
         CONSTRAINTS:
-        - Does not make API calls during initialization
-        - Abstract base class, not to be used directly
+        - API keys handled securely
         """
-        
-    @property
-    def llm(self):
-        """
-        OUTPUT CONTRACT:
-        - Returns: Initialized LLM client
-        
-        GUARANTEES:
-        - Lazy initialization - only creates client when accessed
-        - Handles API key management
+    
+    @abstractmethod
+    def generate(self, *args, **kwargs):
+        """Abstract method all generators must implement.
         
         CONSTRAINTS:
-        - May raise exceptions if API key is invalid or missing
+        - Must validate inputs
+        - Must handle LLM errors gracefully
         """
 ```
 

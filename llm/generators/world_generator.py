@@ -1,31 +1,25 @@
 """
 World generator module that provides functionality for generating game worlds.
-This module extracts the core world generation functionality from the original world.py
-into a reusable, modular component that can be run separately.
+This module orchestrates the generation process using specialized generators
+for themes, plots, mechanics, and items.
 """
-import random
-from operator import itemgetter
 from typing import Any, Dict, List, Optional
 
-from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
-from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-from langchain_core.runnables import RunnableParallel
-from langchain_core.runnables.passthrough import identity
-
 from .base import BaseGenerator
-from ..models import GameMechanics, Items, Themes, WorldModel
+from .theme_generator import ThemeGenerator
+from .title_generator import TitleGenerator
+from .plot_generator import PlotGenerator
+from .mechanics_generator import MechanicsGenerator
+from .item_generator import ItemGenerator
+from ..models import WorldModel
 
 
-class SelectRandomThemeParser(JsonOutputParser):
-    """Parser that selects a random theme from a list of generated themes."""
-    
-    def parse_result(self, text: str) -> str:
-        list_ = super().parse_result(text)["themes"]
-        return random.choice(list_)
+# Removed SelectRandomThemeParser - now in ThemeGenerator
 
 
 class WorldGenerator(BaseGenerator):
-    """Generator for complete game worlds including theme, plot, mechanics and items."""
+    """Generator for complete game worlds including theme, plot, mechanics and items.
+    This class orchestrates the generation process using specialized generators."""
     
     def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
         """
@@ -39,39 +33,12 @@ class WorldGenerator(BaseGenerator):
         super().__init__(api_key, model, temperature)
         self.design_doc = ""
         
-        # Initialize parsers
-        self.theme_parser = SelectRandomThemeParser(pydantic_object=Themes)
-        self.item_parser = OutputFixingParser.from_llm(
-            llm=self.llm,
-            parser=PydanticOutputParser(pydantic_object=Items)
-        )
-        self.gm_parser = OutputFixingParser.from_llm(
-            llm=self.llm,
-            parser=PydanticOutputParser(pydantic_object=GameMechanics)
-        )
-        
-        # Create the standard prompt template
-        self.prompt = self.create_prompt([
-            ("system", 
-                "You are a creative game designer specializing in roguelike games. "
-                "Your task is to assist in the design of a new roguelike game. "
-                "There are certain requirements that you should keep in mind at all times while designing the game:\n"
-                "1. The genre is roguelike, singleplayer, minimalistic.\n"
-                "2. The game uses 2D ASCII engine.\n"
-                "3. The game engine does not support sound.\n"
-                "4. The game is terminal-only (engine supports drawing environment with different symbols).\n"
-                "5. The game experience should be short. No more than an hour."),
-            ("user", "{input}"),
-        ])
-        
-        # Create reusable chains
-        self.chain = {
-            "input": lambda x: x["input"]
-        } | self.prompt | self.llm | StrOutputParser()
-        
-        self.partial_chain = {
-            "input": lambda x: x["input"]
-        } | self.prompt | self.llm
+        # Initialize component generators
+        self.theme_generator = ThemeGenerator(api_key, model, temperature)
+        self.title_generator = TitleGenerator(api_key, model, temperature)
+        self.plot_generator = PlotGenerator(api_key, model, temperature)
+        self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
+        self.item_generator = ItemGenerator(api_key, model, temperature)
     
     def generate_themes(self) -> Dict[str, List[str]]:
         """
@@ -80,14 +47,12 @@ class WorldGenerator(BaseGenerator):
         Returns:
             Dictionary with a 'themes' key containing a list of theme strings.
         """
-        themes_prompt = {
-            "input": (
-                f"Generate different, \"orthogonal\" themes for a game."
-                f"\n{self.theme_parser.get_format_instructions()}"
-            )
-        }
-        chain = self.partial_chain | self.theme_parser
-        return chain.invoke(themes_prompt)
+        # Generate 5 themes and return as a dictionary
+        themes = []
+        for _ in range(5):
+            themes.append(self.theme_generator.generate_single())
+        
+        return {"themes": themes}
     
     def generate_title(self, theme: str) -> str:
         """
@@ -99,11 +64,7 @@ class WorldGenerator(BaseGenerator):
         Returns:
             String containing the generated title.
         """
-        title_prompt = {
-            "input": f"Generate a title for a game with the following theme {theme}."
-        }
-        
-        title = self.chain.invoke(title_prompt)
+        title = self.title_generator.generate(theme)
         self.design_doc += f"Theme: {theme}\n"
         self.design_doc += f"Title: {title}\n"
         return title
@@ -119,12 +80,7 @@ class WorldGenerator(BaseGenerator):
         Returns:
             String containing the generated plot.
         """
-        plot_prompt = {
-            "input": (
-                f"Generate a plot for a game with title {title} and the following overall theme: {theme}."
-            )
-        }
-        plot = self.chain.invoke(plot_prompt)
+        plot = self.plot_generator.generate(theme, title)
         self.design_doc += f"Plot: {plot}\n"
         return plot
     
@@ -140,112 +96,53 @@ class WorldGenerator(BaseGenerator):
         Returns:
             List of game mechanic dictionaries.
         """
-        # For real LLM calls, we need a simpler approach to avoid schema confusion
-        game_mechanics_prompt = {
-            "input": (
-                f"Generate 2-3 detailed game mechanics for a minimalistic console roguelike game with the title '{title}' and theme '{theme}'. "
-                f"The mechanics should align with this plot: '{plot}'. "
-                f"Format your response as a valid JSON object with this structure:\n"
-                f"{{\n"
-                f"  \"mechanics\": [\n"
-                f"    {{ \"name\": \"Mechanic Name\", \"description\": \"Detailed mechanic description\" }},\n"
-                f"    {{ \"name\": \"Another Mechanic\", \"description\": \"Another detailed description\" }}\n"
-                f"  ]\n"
-                f"}}\n"
-                f"IMPORTANT: Return ONLY the JSON with no additional text, explanations, or formatting."
-            )
-        }
-        try:
-            # First try using the regular parser
-            chain = self.partial_chain | self.gm_parser
-            result = chain.invoke(game_mechanics_prompt)
-            return result.mechanics
-        except Exception as e:
-            # If parsing fails, try a more direct approach
-            print(f"Parser error: {e}. Falling back to direct JSON parsing.")
-            chain = self.partial_chain | StrOutputParser()
-            raw_result = chain.invoke(game_mechanics_prompt)
-            
-            # Try to parse the raw JSON
-            try:
-                parsed = json.loads(raw_result)
-                if "mechanics" in parsed and isinstance(parsed["mechanics"], list):
-                    return parsed["mechanics"]
-                else:
-                    raise ValueError(f"Invalid mechanics format in: {parsed}")
-            except json.JSONDecodeError:
-                # As a last resort, return a default mechanic
-                print(f"Failed to parse mechanic JSON. Using fallback mechanic.")
-                return [{
-                    "name": f"Adventure in {theme}",
-                    "description": f"Explore the world of {title} with unique challenges and discoveries."
-                }]
+        mechanics = self.mechanics_generator.generate(theme, title, plot)
+        
+        self.design_doc += f"Game Mechanics: {len(mechanics)} mechanics generated\n"
+        for m in mechanics:
+            self.design_doc += f"- {m['name']}: {m['description']}\n"
+        
+        return mechanics
     
-    def generate_items(self, game_mechanic: GameMechanics) -> List[Dict[str, Any]]:
+    def generate_items(self, mechanics: List[Dict[str, str]]) -> List[Dict[str, Any]]:
         """
-        Generate items based on game mechanics.
+        Generate game items based on mechanics.
         
         Args:
-            game_mechanic: The game mechanics object.
+            mechanics: List of game mechanic dictionaries.
             
         Returns:
             List of item dictionaries.
         """
-        items_prompt = {
-            "input": (
-                "We're in the process of a game design. "
-                "You will be supplied with the design document and one of the game mechanics. "
-                "Your job is to come up with a list of 0 to 3 items that will be used in the game. "
-                "They should be strictly aligned with the game mechanic given. "
-                "If the game mechanic does not have anything to do with the items, give an empty list.\n"
-                "Here's the design document:\n"
-                f"{self.design_doc}\n\n"
-                f"Here's the game mechanic:\n"
-                f"{str(game_mechanic)}\n\n"
-                f"{self.item_parser.get_format_instructions()}"
-            )
-        }
+        items = self.item_generator.generate(mechanics)
         
-        chain = self.partial_chain | self.item_parser
-        return chain.invoke(items_prompt).items
+        self.design_doc += f"Items: {len(items)} items generated\n"
+        for item in items:
+            self.design_doc += f"- {item['name']} [{item['symbol']}]: {item['description']}\n"
+        
+        return items
     
     def generate(self) -> WorldModel:
         """
-        Generate a complete world model.
+        Generate a complete game world.
         
         Returns:
             WorldModel object containing all generated content.
         """
-        # Get a theme - SelectRandomThemeParser already returns a single theme string
-        theme = self.generate_themes()
+        # Get a theme - select one from the generated themes
+        theme = self.theme_generator.generate()
         
         # Generate title
-        title = self.generate_title(theme)
+        title = self.title_generator.generate(theme)
         
         # Generate plot
-        plot = self.generate_plot(theme, title)
+        plot = self.plot_generator.generate(theme, title)
         
         # Generate game mechanics
-        mechanics_list = self.generate_game_mechanics(theme, title, plot)
+        mechanics = self.mechanics_generator.generate(theme, title, plot)
         
-        # Ensure mechanics_list contains proper GameMechanic objects
-        # If we get a list of dicts, convert them to GameMechanic objects
-        processed_mechanics = []
-        for mech in mechanics_list:
-            if isinstance(mech, dict):
-                processed_mechanics.append(GameMechanic(**mech))
-            else:
-                processed_mechanics.append(mech)
-        
-        mechanics = GameMechanics(mechanics=processed_mechanics)
-        
-        # Generate items for each mechanic
-        all_items = []
-        for mechanic in processed_mechanics:
-            # Create a GameMechanics object with a single mechanic
-            mechanic_obj = GameMechanics(mechanics=[mechanic])
-            items = self.generate_items(mechanic_obj)
-            all_items.extend(items)
+        # Generate items using the game mechanics
+        items = self.item_generator.generate(mechanics)
         
         # Create and return the world model
         return WorldModel(
@@ -253,8 +150,7 @@ class WorldGenerator(BaseGenerator):
             title=title,
             plot=plot,
             mechanics=mechanics,
-            items=Items(items=all_items),
-            global_entities={}  # Empty for now, will be filled by the game
+            items=items
         )
 
 
