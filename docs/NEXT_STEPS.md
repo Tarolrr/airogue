@@ -1,5 +1,7 @@
 # AiRogue Modularization - Remaining Work
 
+> Historical design notes: some interfaces and implementation claims are outdated. See the [initial review](INITIAL_REVIEW.md) and verify current behavior against source code.
+
 ## Completed Work
 
 - Extracted specialized generators from monolithic `WorldGenerator`:

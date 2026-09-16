@@ -1,5 +1,7 @@
 # Troubleshooting Guide
 
+> Historical design notes: some interfaces and implementation claims are outdated. See the [initial review](INITIAL_REVIEW.md) and verify current behavior against source code.
+
 ## 🚨 Common LLM Development Issues
 
 This guide helps diagnose and fix common problems when working with LLMs on the AiRogue project.
@@ -299,7 +301,7 @@ Include this information:
 ### Self-Help Resources:
 - `docs/ARCHITECTURE.md` - System overview
 - `docs/MODULE_CONTRACTS.md` - Interface specifications  
-- `docs/LLM_GUIDELINES.md` - Development rules
+- [AGENTS.md](../AGENTS.md) - Development rules
 - `tests/` - Examples of correct usage
 - Git history - See how similar problems were solved
 
