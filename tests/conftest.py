@@ -1,9 +1,20 @@
 """
 Pytest configuration and shared fixtures for AiRogue tests.
 """
+import socket
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
-from typing import Dict, Any
+
+
+def pytest_addoption(parser):
+    """Register the explicit opt-in for tests that call the OpenAI API."""
+    parser.addoption(
+        "--run-requires-openai-api",
+        action="store_true",
+        default=False,
+        help="run tests that require a real OpenAI API connection",
+    )
 
 # Test data fixtures
 @pytest.fixture
@@ -119,15 +130,44 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "slow: marks tests as slow running"
     )
+    config.addinivalue_line(
+        "markers", "requires_openai_api: marks tests that require the OpenAI API"
+    )
+
+
+def pytest_sessionstart(session):
+    """Reject network access in the default, offline test suite.
+
+    This is installed before test collection, so importing a module that opens
+    a socket cannot silently make a paid API request.  The explicit OpenAI
+    opt-in keeps the manually run end-to-end tests available.
+    """
+    if session.config.getoption("--run-requires-openai-api"):
+        return
+
+    original_socket = socket.socket
+
+    class OfflineSocket(original_socket):
+        def connect(self, address):
+            raise RuntimeError("Network access is disabled during offline tests")
+
+        def connect_ex(self, address):
+            raise RuntimeError("Network access is disabled during offline tests")
+
+    socket.socket = OfflineSocket
 
 # Test collection hooks
 def pytest_collection_modifyitems(config, items):
-    """Modify test collection to add markers automatically"""
+    """Skip real API tests unless they were explicitly requested."""
+    if not config.getoption("--run-requires-openai-api"):
+        skip_openai = pytest.mark.skip(
+            reason="need --run-requires-openai-api option to run"
+        )
+        for item in items:
+            if "requires_openai_api" in item.keywords:
+                item.add_marker(skip_openai)
+
     for item in items:
         # Mark integration tests
         if "integration" in item.nodeid:
             item.add_marker(pytest.mark.integration)
-        
-        # Mark LLM tests
-        if "llm" in item.nodeid and "mock" not in item.nodeid:
-            item.add_marker(pytest.mark.llm)

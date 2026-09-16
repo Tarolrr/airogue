@@ -63,6 +63,8 @@ poetry run python main.py
 poetry run python -m pytest tests/ -v --ignore=tests/test_world_generator_e2e.py
 ```
 
-Исключение явно задано: механизм включения API-тестов размещён в самом тестовом модуле и не служит надёжным pytest-плагином. Не полагайтесь только на `-m "not llm"`. Остальные тесты тоже требуют ревью моков; зелёный baseline пока не подтверждён. Подробности — в [руководстве по тестированию](tests/README.md).
+Обычный набор блокирует сетевые соединения и не использует API-ключ. Тесты с реальными запросами помечены `requires_openai_api` и требуют явного `--run-requires-openai-api`; не запускайте их в CI. Smoke-тест игрового цикла использует настоящий ECS и offscreen console, но подменяет загрузчик мира и оконный context: это проверка старта, кадра и корректного закрытия, не готовности `world_model.json` к запуску. Подробности — в [руководстве по тестированию](tests/README.md).
+
+GitHub Actions запускает `tests` и `lint` при push в любую ветку и при PR в `main`, поэтому ветки Looper не требуют отдельного имени или фильтра. Для запуска checks, созданных Looper, его учётные данные должны создавать обычные GitHub события `push`/`pull_request`; push, сделанный встроенным `GITHUB_TOKEN` другого workflow, GitHub намеренно не каскадирует.
 
 Перед изменениями прочитайте [AGENTS.md](AGENTS.md) и [первичное ревью](docs/INITIAL_REVIEW.md). [Архитектура](docs/ARCHITECTURE.md), [контракты](docs/MODULE_CONTRACTS.md), [план работ](docs/NEXT_STEPS.md), [troubleshooting](docs/TROUBLESHOOTING.md) и [старый анализ](project_analysis.md) содержат полезный контекст, но частично описывают желаемое состояние. Расхождения перечислены в ревью; фактические интерфейсы проверяйте по коду.

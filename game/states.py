@@ -50,11 +50,15 @@ class InGame:
 
     def on_event(self, event: tcod.event.Event) -> None:
         """Handle events for the in-game state."""
+        # Closing the window must not depend on a complete game registry.  In
+        # particular, querying components first can raise while a world is
+        # loading and prevent a Quit event from reaching the application loop.
+        if isinstance(event, tcod.event.Quit):
+            raise SystemExit()
+
         (player,) = g.world.Q.all_of(tags=[IsPlayer])
         (game_component,) = g.world.Q.all_of(components=[])  # TODO fix
         match event:
-            case tcod.event.Quit():
-                raise SystemExit()
             case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
                 game_component.attributes["time"] += 1
                 game_component.signals["tick"].emit(game_component.attributes["time"])
@@ -85,4 +89,3 @@ class InGame:
 
         if text := g.world[None].components.get(("Text", str)):
             console.print_box(x=0, y=console.height - 5, width=console.width, height=5, string=text, fg=(255, 255, 255), bg=(0, 0, 0))
-
