@@ -57,9 +57,11 @@ class TestCliTool(unittest.TestCase):
         mock_world.mechanics.mechanics = [
             MagicMock(name="Magic", description="Use spells to defeat enemies.")
         ]
-        mock_world.items.items = [
-            {"name": "Magic Wand", "ascii_symbol": "/", "description": "A powerful wand."}
-        ]
+        mock_item = MagicMock()
+        mock_item.name = "Magic Wand"
+        mock_item.ascii_symbol = "/"
+        mock_item.description = "A powerful wand."
+        mock_world.items.items = [mock_item]
         mock_world.model_dump_json = MagicMock(
             return_value=json.dumps({"theme": "Fantasy"})
         )
