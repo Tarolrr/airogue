@@ -60,7 +60,9 @@ class TestCliTool(unittest.TestCase):
         mock_world.items.items = [
             {"name": "Magic Wand", "ascii_symbol": "/", "description": "A powerful wand."}
         ]
-        mock_world.json = MagicMock(return_value=json.dumps({"theme": "Fantasy"}))
+        mock_world.model_dump_json = MagicMock(
+            return_value=json.dumps({"theme": "Fantasy"})
+        )
         mock_generator_instance.generate.return_value = mock_world
         
         # Create a temporary file for output testing
@@ -111,7 +113,8 @@ class TestCliTool(unittest.TestCase):
         # The actual implementation in cli.py uses positional arguments
         mock_generate_world.assert_called_once_with(
             "test_api_key", 
-            "test_output.json"
+            "test_output.json",
+            1.0,
         )
 
     @patch('subprocess.run')
