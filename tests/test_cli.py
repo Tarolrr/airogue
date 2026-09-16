@@ -57,10 +57,14 @@ class TestCliTool(unittest.TestCase):
         mock_world.mechanics.mechanics = [
             MagicMock(name="Magic", description="Use spells to defeat enemies.")
         ]
-        mock_world.items.items = [
-            {"name": "Magic Wand", "ascii_symbol": "/", "description": "A powerful wand."}
-        ]
-        mock_world.json = MagicMock(return_value=json.dumps({"theme": "Fantasy"}))
+        mock_item = MagicMock()
+        mock_item.name = "Magic Wand"
+        mock_item.ascii_symbol = "/"
+        mock_item.description = "A powerful wand."
+        mock_world.items.items = [mock_item]
+        mock_world.model_dump_json = MagicMock(
+            return_value=json.dumps({"theme": "Fantasy"})
+        )
         mock_generator_instance.generate.return_value = mock_world
         
         # Create a temporary file for output testing
@@ -80,7 +84,9 @@ class TestCliTool(unittest.TestCase):
                 self.assertEqual(saved_content, json.dumps({"theme": "Fantasy"}))
                 
             # Verify WorldGenerator was called with correct parameters
-            mock_world_generator.assert_called_once_with(api_key="test_key")
+            mock_world_generator.assert_called_once_with(
+                api_key="test_key", temperature=1.0
+            )
             mock_generator_instance.generate.assert_called_once()
             
         finally:
@@ -99,6 +105,8 @@ class TestCliTool(unittest.TestCase):
         mock_args = MagicMock()
         mock_args.api_key = "test_api_key"
         mock_args.output = "test_output.json"
+        mock_args.temperature = 1.0
+        mock_args.env_file = None
         mock_parse_args.return_value = mock_args
         
         # Call the main function
@@ -111,7 +119,8 @@ class TestCliTool(unittest.TestCase):
         # The actual implementation in cli.py uses positional arguments
         mock_generate_world.assert_called_once_with(
             "test_api_key", 
-            "test_output.json"
+            "test_output.json",
+            1.0,
         )
 
     @patch('subprocess.run')

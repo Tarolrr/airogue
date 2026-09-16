@@ -15,27 +15,6 @@ from llm.models import WorldModel, GameMechanics, Items
 from llm.generators.world_generator import WorldGenerator
 
 
-# Define a custom pytest marker for tests that require OpenAI API
-def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "requires_openai_api: mark test as requiring OpenAI API access"
-    )
-
-# Add a command line option to run these tests
-def pytest_addoption(parser):
-    parser.addoption(
-        "--run-requires-openai-api", action="store_true", default=False, help="run tests that require OpenAI API"
-    )
-
-# Skip the marked tests unless explicitly requested
-def pytest_collection_modifyitems(config, items):
-    if not config.getoption("--run-requires-openai-api"):
-        skip_openai = pytest.mark.skip(reason="need --run-requires-openai-api option to run")
-        for item in items:
-            if "requires_openai_api" in item.keywords:
-                item.add_marker(skip_openai)
-
-
 class TestWorldGeneratorE2E:
     """End-to-end tests for WorldGenerator."""
     
