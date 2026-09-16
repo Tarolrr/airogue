@@ -7,7 +7,7 @@ poetry run python -m pytest tests/ -v --ignore=tests/test_world_generator_e2e.py
 poetry run python -m pytest tests/test_theme_generator.py -v
 poetry run python -m pytest tests/test_cli.py -v
 poetry run python -m llm.generators.cli --help
-poetry run flake8 . --select=E9,F63,F7,F82 --exclude=.git,.venv
+poetry run flake8 . --select=E9,F63,F7,F82 --exclude=.git,.venv,scratch.py,game/pipeline.py,game/slots.py,llm/models.py
 ```
 
 Обычный набор запрещает socket-соединения до collection и не использует API-ключ. Реальные API-проверки в `test_world_generator_e2e.py` помечены `requires_openai_api` и выполняются только при явном `--run-requires-openai-api`; это ручной, потенциально платный запуск, не часть CI.

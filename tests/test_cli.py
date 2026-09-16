@@ -84,7 +84,9 @@ class TestCliTool(unittest.TestCase):
                 self.assertEqual(saved_content, json.dumps({"theme": "Fantasy"}))
                 
             # Verify WorldGenerator was called with correct parameters
-            mock_world_generator.assert_called_once_with(api_key="test_key")
+            mock_world_generator.assert_called_once_with(
+                api_key="test_key", temperature=1.0
+            )
             mock_generator_instance.generate.assert_called_once()
             
         finally:
@@ -103,6 +105,8 @@ class TestCliTool(unittest.TestCase):
         mock_args = MagicMock()
         mock_args.api_key = "test_api_key"
         mock_args.output = "test_output.json"
+        mock_args.temperature = 1.0
+        mock_args.env_file = None
         mock_parse_args.return_value = mock_args
         
         # Call the main function
