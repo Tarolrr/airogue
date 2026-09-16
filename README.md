@@ -67,4 +67,6 @@ poetry run python -m pytest tests/ -v --ignore=tests/test_world_generator_e2e.py
 
 GitHub Actions запускает `tests` и `lint` при push в любую ветку и при PR в `main`, поэтому ветки Looper не требуют отдельного имени или фильтра. Для запуска checks, созданных Looper, его учётные данные должны создавать обычные GitHub события `push`/`pull_request`; push, сделанный встроенным `GITHUB_TOKEN` другого workflow, GitHub намеренно не каскадирует.
 
+`lint` проверяет синтаксис и фатальные ошибки во всех активных модулях. Пока не завершены старые заготовки `scratch.py`, `game/pipeline.py`, `game/slots.py` и устаревшие action-классы в `llm/models.py`, они исключены из этой проверки: их неопределённые ссылки не относятся к покрытому сценарию запуска. При доработке этих модулей исключения следует убрать и добавить их в обычную проверку.
+
 Перед изменениями прочитайте [AGENTS.md](AGENTS.md) и [первичное ревью](docs/INITIAL_REVIEW.md). [Архитектура](docs/ARCHITECTURE.md), [контракты](docs/MODULE_CONTRACTS.md), [план работ](docs/NEXT_STEPS.md), [troubleshooting](docs/TROUBLESHOOTING.md) и [старый анализ](project_analysis.md) содержат полезный контекст, но частично описывают желаемое состояние. Расхождения перечислены в ревью; фактические интерфейсы проверяйте по коду.
