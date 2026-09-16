@@ -1,5 +1,7 @@
 # AiRogue Architecture
 
+> Historical design notes: some interfaces and implementation claims are outdated. See the [initial review](INITIAL_REVIEW.md) and verify current behavior against source code.
+
 ## Overview
 
 AiRogue is a roguelike game that uses Large Language Models (LLMs) to dynamically generate game content. The architecture is designed to be LLM-friendly, modular, and resilient to AI-assisted development.
@@ -144,7 +146,7 @@ The Component System extends the basic ECS with LLM-powered behaviors through pi
 
 ## Development Guidelines
 
-See `LLM_GUIDELINES.md` for detailed contribution rules.
+See [AGENTS.md](../AGENTS.md) for detailed contribution rules.
 
 ## Roadmap
 

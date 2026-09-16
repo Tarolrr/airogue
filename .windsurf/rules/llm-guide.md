@@ -4,6 +4,8 @@ trigger: always_on
 
 # LLM Development Guidelines
 
+> Historical editor-specific guidance. Read [AGENTS.md](../../AGENTS.md) and the [initial review](../../docs/INITIAL_REVIEW.md) first; some paths and API examples below are outdated.
+
 ## 🚨 CRITICAL SETUP - ACTIVATE VIRTUAL ENVIRONMENT FIRST! 🚨
 
 **⚠️ BEFORE DOING ANYTHING ELSE, ALWAYS ACTIVATE THE VIRTUAL ENVIRONMENT:**

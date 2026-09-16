@@ -1,5 +1,7 @@
 # Module Contracts
 
+> Historical design notes: some interfaces and implementation claims are outdated. See the [initial review](INITIAL_REVIEW.md) and verify current behavior against source code.
+
 This document defines the explicit interfaces and contracts between modules. **LLMs must respect these contracts** - breaking them will cause system failures.
 
 ## 🎯 Core Principle

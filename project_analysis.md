@@ -1,5 +1,7 @@
 # AiRogue Project Analysis
 
+> Historical design notes: some interfaces and implementation claims are outdated. See the [initial review](docs/INITIAL_REVIEW.md) and verify current behavior against source code.
+
 ## Overall Architecture
 
 ```mermaid
