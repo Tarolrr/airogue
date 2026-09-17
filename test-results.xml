@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="11" skipped="4" tests="48" time="27.231" timestamp="2026-09-17T01:16:16.796190" hostname="orangepizero2w"><testcase classname="tests.test_cli.TestCliTool" name="test_cli_imports" time="0.023"><failure message="AssertionError: CLI import failed: No module named 'dotenv'">self = &lt;tests.test_cli.TestCliTool testMethod=test_cli_imports&gt;
+
+    def test_cli_imports(self):
+        """Test that CLI imports work correctly."""
+        # Import the CLI module to check if imports are resolved correctly
+        try:
+&gt;           from llm.generators import cli
+
+tests/test_cli.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    #!/usr/bin/env python
+    """
+    Command-line interface for the world generator.
+    This script allows the world generator to be run as a standalone tool.
+    """
+    import os
+    import sys
+    import json
+    import argparse
+    from typing import Optional
+&gt;   import dotenv
+E   ModuleNotFoundError: No module named 'dotenv'
+
+llm/generators/cli.py:11: ModuleNotFoundError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;tests.test_cli.TestCliTool testMethod=test_cli_imports&gt;
+
+    def test_cli_imports(self):
+        """Test that CLI imports work correctly."""
+        # Import the CLI module to check if imports are resolved correctly
+        try:
+            from llm.generators import cli
+            # If import succeeds, the test passes
+            self.assertTrue(True)
+        except ImportError as e:
+&gt;           self.fail(f"CLI import failed: {e}")
+E           AssertionError: CLI import failed: No module named 'dotenv'
+
+tests/test_cli.py:40: AssertionError</failure></testcase><testcase classname="tests.test_cli.TestCliTool" name="test_direct_script_execution" time="0.011" /><testcase classname="tests.test_cli.TestCliTool" name="test_generate_world_function" time="0.009"><failure message="ModuleNotFoundError: No module named 'dotenv'">thing = &lt;module 'llm.generators' from '/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/llm/generators/__init__.py'&gt;
+comp = 'cli', import_path = 'llm.generators.cli'
+
+    def _dot_lookup(thing, comp, import_path):
+        try:
+&gt;           return getattr(thing, comp)
+E           AttributeError: module 'llm.generators' has no attribute 'cli'
+
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1248: AttributeError
+
+During handling of the above exception, another exception occurred:
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1376: in patched
+    with self.decoration_helper(patched,
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1358: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1431: in __enter__
+    self.target = self.getter()
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1618: in &lt;lambda&gt;
+    getter = lambda: _importer(target)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1261: in _importer
+    thing = _dot_lookup(thing, comp, import_path)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1250: in _dot_lookup
+    __import__(import_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    #!/usr/bin/env python
+    """
+    Command-line interface for the world generator.
+    This script allows the world generator to be run as a standalone tool.
+    """
+    import os
+    import sys
+    import json
+    import argparse
+    from typing import Optional
+&gt;   import dotenv
+E   ModuleNotFoundError: No module named 'dotenv'
+
+llm/generators/cli.py:11: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_cli.TestCliTool" name="test_main_function" time="0.012"><failure message="ModuleNotFoundError: No module named 'dotenv'">thing = &lt;module 'llm.generators' from '/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/llm/generators/__init__.py'&gt;
+comp = 'cli', import_path = 'llm.generators.cli'
+
+    def _dot_lookup(thing, comp, import_path):
+        try:
+&gt;           return getattr(thing, comp)
+E           AttributeError: module 'llm.generators' has no attribute 'cli'
+
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1248: AttributeError
+
+During handling of the above exception, another exception occurred:
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1376: in patched
+    with self.decoration_helper(patched,
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1358: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1431: in __enter__
+    self.target = self.getter()
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1618: in &lt;lambda&gt;
+    getter = lambda: _importer(target)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1261: in _importer
+    thing = _dot_lookup(thing, comp, import_path)
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1250: in _dot_lookup
+    __import__(import_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    #!/usr/bin/env python
+    """
+    Command-line interface for the world generator.
+    This script allows the world generator to be run as a standalone tool.
+    """
+    import os
+    import sys
+    import json
+    import argparse
+    from typing import Optional
+&gt;   import dotenv
+E   ModuleNotFoundError: No module named 'dotenv'
+
+llm/generators/cli.py:11: ModuleNotFoundError</failure></testcase><testcase classname="tests.test_game_startup" name="test_main_draws_a_frame_and_releases_context_on_quit" time="0.013" /><testcase classname="tests.test_game_startup" name="test_main_releases_context_when_present_fails" time="0.012" /><testcase classname="tests.test_game_startup" name="test_quit_does_not_query_an_incomplete_registry" time="0.007" /><testcase classname="tests.test_import_debugging.TestImportDebugging" name="test_llm_package_exists" time="0.004" /><testcase classname="tests.test_import_debugging.TestImportDebugging" name="test_llm_world_module_direct_import" time="0.004" /><testcase classname="tests.test_import_debugging.TestImportDebugging" name="test_world_class_direct_import" time="0.004" /><testcase classname="tests.test_import_debugging.TestImportDebugging" name="test_game_package_exists" time="0.005" /><testcase classname="tests.test_import_debugging.TestImportDebugging" name="test_game_world_tools_direct_import" time="0.004" /><testcase classname="tests.test_import_debugging.TestImportDebugging" name="test_new_world_function_direct_import" time="0.004" /><testcase classname="tests.test_integration" name="test_full_world_generation_pipeline" time="0.009"><skipped type="pytest.skip" message="Requires modular LLM generators - implement after refactoring">/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/tests/test_integration.py:21: Requires modular LLM generators - implement after refactoring</skipped></testcase><testcase classname="tests.test_integration" name="test_llm_content_to_game_entities" time="0.005"><skipped type="pytest.skip" message="Requires world_tools refactoring - implement after modularization">/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/tests/test_integration.py:26: Requires world_tools refactoring - implement after modularization</skipped></testcase><testcase classname="tests.test_integration" name="test_game_startup_with_generated_content" time="0.004"><skipped type="pytest.skip" message="Requires full pipeline - implement after modularization">/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/tests/test_integration.py:31: Requires full pipeline - implement after modularization</skipped></testcase><testcase classname="tests.test_integration" name="test_error_recovery_in_pipeline" time="0.005"><skipped type="pytest.skip" message="Requires error handling framework - implement after modularization">/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/tests/test_integration.py:36: Requires error handling framework - implement after modularization</skipped></testcase><testcase classname="tests.test_integration.TestWorldGenerationContract" name="test_theme_generation_contract" time="0.005" /><testcase classname="tests.test_integration.TestWorldGenerationContract" name="test_plot_generation_contract" time="0.006" /><testcase classname="tests.test_integration.TestWorldGenerationContract" name="test_mechanics_generation_contract" time="0.007" /><testcase classname="tests.test_integration.TestWorldGenerationContract" name="test_item_generation_contract" time="0.006" /><testcase classname="tests.test_offline_network" name="test_offline_suite_rejects_socket_connections" time="0.008" /><testcase classname="tests.test_openai_key_requirement.TestOpenAIKeyRequirement" name="test_world_instantiation_requires_api_key" time="0.040" /><testcase classname="tests.test_theme_generator.TestThemeGenerator" name="test_generate" time="0.034"><failure message="AssertionError: Expected 'choice' to be called once. Called 0 times.">self = &lt;MagicMock name='choice' id='281473415392480'&gt;
+args = (['Theme 1', 'Theme 2'],), kwargs = {}
+msg = "Expected 'choice' to be called once. Called 0 times."
+
+    def assert_called_once_with(self, /, *args, **kwargs):
+        """assert that the mock was called exactly once and that that call was
+        with the specified arguments."""
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to be called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+&gt;           raise AssertionError(msg)
+E           AssertionError: Expected 'choice' to be called once. Called 0 times.
+
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:940: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;tests.test_theme_generator.TestThemeGenerator testMethod=test_generate&gt;
+mock_init = &lt;MagicMock name='__init__' id='281473416269392'&gt;
+mock_create_prompt = &lt;MagicMock name='create_prompt' id='281473416880400'&gt;
+mock_llm_prop = &lt;PropertyMock name='llm' id='281473416272944'&gt;
+mock_json_parser = &lt;MagicMock name='JsonOutputParser' id='281473415397040'&gt;
+mock_choice = &lt;MagicMock name='choice' id='281473415392480'&gt;
+
+    @patch("llm.generators.theme_generator.random.choice")
+    @patch("llm.generators.theme_generator.JsonOutputParser")
+    @patch("llm.generators.theme_generator.BaseGenerator.llm", new_callable=PropertyMock)
+    @patch("llm.generators.theme_generator.BaseGenerator.create_prompt")
+    @patch("llm.generators.theme_generator.BaseGenerator.__init__", return_value=None)
+    def test_generate(self, mock_init, mock_create_prompt, mock_llm_prop, mock_json_parser, mock_choice):
+        """Test generate method."""
+        # Setup
+        mock_llm = MagicMock()
+        mock_llm_prop.return_value = mock_llm
+    
+        # Set up the JSON parser mock
+        mock_parser_instance = MagicMock()
+        mock_json_parser.return_value = mock_parser_instance
+    
+        # Set up the chain mocking
+        mock_chain = MagicMock()
+        mock_chain.invoke.return_value = {"themes": ["Theme 1", "Theme 2"]}
+        mock_prompt = MagicMock()
+        mock_create_prompt.return_value = mock_prompt
+    
+        # Mock the random choice to return a fixed theme
+        mock_choice.return_value = "Theme 1"
+    
+        # Mock the pipe operation
+        mock_prompt.__or__.return_value = MagicMock()
+        mock_prompt.__or__.return_value.__or__ = MagicMock(return_value=mock_chain)
+    
+        # Create the generator
+        generator = ThemeGenerator()
+    
+        # Call the method
+        result = generator.generate()
+    
+        # Verify
+        mock_create_prompt.assert_called_once()
+&gt;       mock_choice.assert_called_once_with(["Theme 1", "Theme 2"])
+E       AssertionError: Expected 'choice' to be called once. Called 0 times.
+
+tests/test_theme_generator.py:76: AssertionError</failure></testcase><testcase classname="tests.test_theme_generator.TestThemeGenerator" name="test_generate_single" time="0.027" /><testcase classname="tests.test_world_generation_isolation.TestWorldModelLoading" name="test_valid_world_model_loads_successfully" time="0.009" /><testcase classname="tests.test_world_generation_isolation.TestWorldModelLoading" name="test_invalid_world_model_raises_validation_error" time="0.009" /><testcase classname="tests.test_world_generation_isolation.TestWorldModelLoading" name="test_world_model_json_file_loading" time="0.043" /><testcase classname="tests.test_world_generation_isolation.TestWorldModelLoading" name="test_malformed_json_raises_json_error" time="0.036" /><testcase classname="tests.test_world_generation_isolation.TestWorldModelLoading" name="test_missing_json_file_raises_file_error" time="0.012" /><testcase classname="tests.test_world_generation_isolation.TestLLMWorldGeneration" name="test_world_class_instantiation" time="0.009"><failure message="AttributeError: &lt;module 'llm.world' from '/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/llm/world.py'&gt; does not have the attribute 'ChatOpenAI'">self = &lt;tests.test_world_generation_isolation.TestLLMWorldGeneration object at 0xffffa31a96c0&gt;
+
+    def test_world_class_instantiation(self):
+        """Test that World class can be instantiated without crashes."""
+        # Mock OpenAI to avoid API calls during testing
+&gt;       with patch('llm.world.ChatOpenAI') as mock_openai:
+
+tests/test_world_generation_isolation.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1447: in __enter__
+    original, local = self.get_original()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;unittest.mock._patch object at 0xffffa2f84cd0&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: &lt;module 'llm.world' from '/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/llm/world.py'&gt; does not have the attribute 'ChatOpenAI'
+
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1420: AttributeError</failure></testcase><testcase classname="tests.test_world_generation_isolation.TestLLMWorldGeneration" name="test_world_generation_with_mocked_llm" time="0.009"><failure message="AttributeError: &lt;module 'llm.world' from '/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/llm/world.py'&gt; does not have the attribute 'ChatOpenAI'">self = &lt;tests.test_world_generation_isolation.TestLLMWorldGeneration object at 0xffffa31aa140&gt;
+
+    def test_world_generation_with_mocked_llm(self):
+        """Test world generation with mocked LLM responses."""
+        # Mock all LLM components
+&gt;       with patch('llm.world.ChatOpenAI') as mock_openai:
+
+tests/test_world_generation_isolation.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1447: in __enter__
+    original, local = self.get_original()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;unittest.mock._patch object at 0xffffa2f57d00&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: &lt;module 'llm.world' from '/root/.looper/worktrees/repo-68b18402aa9757d72e8d1d868ec897082a1dc1cd2571c07749f07d09e3069037/airogue/looper-fix-airogue-pr-8-detached/llm/world.py'&gt; does not have the attribute 'ChatOpenAI'
+
+/root/.local/share/uv/python/cpython-3.10.21-linux-aarch64-gnu/lib/python3.10/unittest/mock.py:1420: AttributeError</failure></testcase><testcase classname="tests.test_world_generation_isolation.TestWorldToolsIntegration" name="test_new_world_with_valid_json_data" time="0.252" /><testcase classname="tests.test_world_generation_isolation.TestWorldToolsIntegration" name="test_new_world_handles_missing_json_gracefully" time="0.045" /><testcase classname="tests.test_world_generation_isolation.TestWorldToolsIntegration" name="test_new_world_handles_malformed_json_gracefully" time="0.071" /><testcase classname="tests.test_world_generation_isolation.TestItemGeneration" name="test_item_creation_from_valid_data" time="0.011" /><testcase classname="tests.test_world_generation_isolation.TestItemGeneration" name="test_items_collection_creation" time="0.011" /><testcase classname="tests.test_world_generation_isolation.TestItemGeneration" name="test_invalid_item_data_raises_validation_error" time="0.011" /><testcase classname="tests.test_world_generation_isolation.TestErrorRecovery" name="test_world_generation_fallback_mechanisms" time="0.010" /><testcase classname="tests.test_world_generation_isolation.TestErrorRecovery" name="test_partial_world_model_handling" time="0.009" /><testcase classname="tests.test_world_generation_stable.TestWorldModelStability" name="test_world_model_validation" time="0.011" /><testcase classname="tests.test_world_generation_stable.TestWorldToolsWithMocks" name="test_new_world_function_returns_registry" time="0.231" /><testcase classname="tests.test_world_generation_stable.TestWorldToolsWithMocks" name="test_new_world_handles_json_errors_gracefully" time="0.036" /><testcase classname="tests.test_world_methods.TestWorldMethods" name="test_theme_generation" time="0.275"><failure message="pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)">self = &lt;tests.test_world_methods.TestWorldMethods object at 0xffffa2fe0760&gt;
+
+    def test_theme_generation(self):
+        """Test theme() method returns themes correctly."""
+        with patch('llm.generators.base.ChatOpenAI') as mock_chat:
+    
+            # Setup mocks
+            mock_chat.return_value = MagicMock()
+    
+            # Import inside test to use mocks
+            from llm.world import World
+&gt;           world = World(None)
+
+tests/test_world_methods.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+llm/world.py:35: in __init__
+    self.generator = WorldGenerator(api_key=api_key)
+llm/generators/world_generator.py:40: in __init__
+    self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
+llm/generators/mechanics_generator.py:29: in __init__
+    self.gm_parser = OutputFixingParser.from_llm(
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain/output_parsers/fix.py:51: in from_llm
+    chain = LLMChain(llm=llm, prompt=prompt)
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain_core/load/serializable.py:120: in __init__
+    super().__init__(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+__pydantic_self__ = LLMChain()
+data = {'llm': &lt;MagicMock name='ChatOpenAI()' id='281473413865024'&gt;, 'prompt': PromptTemplate(input_variables=['completion', ...n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:')}
+values = {'callback_manager': None, 'callbacks': None, 'llm_kwargs': {}, 'memory': None, ...}
+fields_set = {'llm', 'prompt'}
+validation_error = ValidationError(model='LLMChain', errors=[{'loc': ('llm',), 'msg': 'instance of Runnable expected', 'type': 'type_erro...'instance of Runnable expected', 'type': 'type_error.arbitrary_type', 'ctx': {'expected_arbitrary_type': 'Runnable'}}])
+
+    def __init__(__pydantic_self__, **data: Any) -&gt; None:
+        """
+        Create a new model by parsing and validating input data from keyword arguments.
+    
+        Raises ValidationError if the input data cannot be parsed to form a valid model.
+        """
+        # Uses something other than `self` the first arg to allow "self" as a settable attribute
+        values, fields_set, validation_error = validate_model(__pydantic_self__.__class__, data)
+        if validation_error:
+&gt;           raise validation_error
+E           pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/pydantic/v1/main.py:341: ValidationError</failure></testcase><testcase classname="tests.test_world_methods.TestWorldMethods" name="test_generate_title" time="0.012"><failure message="pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)">self = &lt;tests.test_world_methods.TestWorldMethods object at 0xffffa2fe0df0&gt;
+
+    def test_generate_title(self):
+        """Test generate_title() method returns a title based on theme."""
+        with patch('llm.generators.base.ChatOpenAI') as mock_chat:
+            # Setup mocks
+            mock_chat.return_value = MagicMock()
+    
+            # Import inside test to use mocks
+            from llm.world import World
+&gt;           world = World(None)
+
+tests/test_world_methods.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+llm/world.py:35: in __init__
+    self.generator = WorldGenerator(api_key=api_key)
+llm/generators/world_generator.py:40: in __init__
+    self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
+llm/generators/mechanics_generator.py:29: in __init__
+    self.gm_parser = OutputFixingParser.from_llm(
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain/output_parsers/fix.py:51: in from_llm
+    chain = LLMChain(llm=llm, prompt=prompt)
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain_core/load/serializable.py:120: in __init__
+    super().__init__(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+__pydantic_self__ = LLMChain()
+data = {'llm': &lt;MagicMock name='ChatOpenAI()' id='281473411471808'&gt;, 'prompt': PromptTemplate(input_variables=['completion', ...n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:')}
+values = {'callback_manager': None, 'callbacks': None, 'llm_kwargs': {}, 'memory': None, ...}
+fields_set = {'llm', 'prompt'}
+validation_error = ValidationError(model='LLMChain', errors=[{'loc': ('llm',), 'msg': 'instance of Runnable expected', 'type': 'type_erro...'instance of Runnable expected', 'type': 'type_error.arbitrary_type', 'ctx': {'expected_arbitrary_type': 'Runnable'}}])
+
+    def __init__(__pydantic_self__, **data: Any) -&gt; None:
+        """
+        Create a new model by parsing and validating input data from keyword arguments.
+    
+        Raises ValidationError if the input data cannot be parsed to form a valid model.
+        """
+        # Uses something other than `self` the first arg to allow "self" as a settable attribute
+        values, fields_set, validation_error = validate_model(__pydantic_self__.__class__, data)
+        if validation_error:
+&gt;           raise validation_error
+E           pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/pydantic/v1/main.py:341: ValidationError</failure></testcase><testcase classname="tests.test_world_methods.TestWorldMethods" name="test_generate_plot" time="0.014"><failure message="pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)">self = &lt;tests.test_world_methods.TestWorldMethods object at 0xffffa2fe1420&gt;
+
+    def test_generate_plot(self):
+        """Test generate_plot() method returns a plot based on theme and title."""
+        with patch('llm.generators.base.ChatOpenAI') as mock_chat:
+            # Setup mocks
+            mock_chat.return_value = MagicMock()
+    
+            # Import inside test to use mocks
+            from llm.world import World
+&gt;           world = World(None)
+
+tests/test_world_methods.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+llm/world.py:35: in __init__
+    self.generator = WorldGenerator(api_key=api_key)
+llm/generators/world_generator.py:40: in __init__
+    self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
+llm/generators/mechanics_generator.py:29: in __init__
+    self.gm_parser = OutputFixingParser.from_llm(
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain/output_parsers/fix.py:51: in from_llm
+    chain = LLMChain(llm=llm, prompt=prompt)
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain_core/load/serializable.py:120: in __init__
+    super().__init__(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+__pydantic_self__ = LLMChain()
+data = {'llm': &lt;MagicMock name='ChatOpenAI()' id='281473416134816'&gt;, 'prompt': PromptTemplate(input_variables=['completion', ...n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:')}
+values = {'callback_manager': None, 'callbacks': None, 'llm_kwargs': {}, 'memory': None, ...}
+fields_set = {'llm', 'prompt'}
+validation_error = ValidationError(model='LLMChain', errors=[{'loc': ('llm',), 'msg': 'instance of Runnable expected', 'type': 'type_erro...'instance of Runnable expected', 'type': 'type_error.arbitrary_type', 'ctx': {'expected_arbitrary_type': 'Runnable'}}])
+
+    def __init__(__pydantic_self__, **data: Any) -&gt; None:
+        """
+        Create a new model by parsing and validating input data from keyword arguments.
+    
+        Raises ValidationError if the input data cannot be parsed to form a valid model.
+        """
+        # Uses something other than `self` the first arg to allow "self" as a settable attribute
+        values, fields_set, validation_error = validate_model(__pydantic_self__.__class__, data)
+        if validation_error:
+&gt;           raise validation_error
+E           pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/pydantic/v1/main.py:341: ValidationError</failure></testcase><testcase classname="tests.test_world_methods.TestWorldMethods" name="test_generate_items" time="0.014"><failure message="pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)">self = &lt;tests.test_world_methods.TestWorldMethods object at 0xffffa2fe14e0&gt;
+
+    def test_generate_items(self):
+        """Test generate_items() method returns items based on mechanics."""
+        with patch('llm.generators.base.ChatOpenAI') as mock_chat:
+    
+            # Setup mocks
+            mock_chat.return_value = MagicMock()
+    
+            # Import inside test to use mocks
+            from llm.world import World
+&gt;           world = World(None)
+
+tests/test_world_methods.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+llm/world.py:35: in __init__
+    self.generator = WorldGenerator(api_key=api_key)
+llm/generators/world_generator.py:40: in __init__
+    self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
+llm/generators/mechanics_generator.py:29: in __init__
+    self.gm_parser = OutputFixingParser.from_llm(
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain/output_parsers/fix.py:51: in from_llm
+    chain = LLMChain(llm=llm, prompt=prompt)
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain_core/load/serializable.py:120: in __init__
+    super().__init__(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+__pydantic_self__ = LLMChain()
+data = {'llm': &lt;MagicMock name='ChatOpenAI()' id='281473411994368'&gt;, 'prompt': PromptTemplate(input_variables=['completion', ...n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:')}
+values = {'callback_manager': None, 'callbacks': None, 'llm_kwargs': {}, 'memory': None, ...}
+fields_set = {'llm', 'prompt'}
+validation_error = ValidationError(model='LLMChain', errors=[{'loc': ('llm',), 'msg': 'instance of Runnable expected', 'type': 'type_erro...'instance of Runnable expected', 'type': 'type_error.arbitrary_type', 'ctx': {'expected_arbitrary_type': 'Runnable'}}])
+
+    def __init__(__pydantic_self__, **data: Any) -&gt; None:
+        """
+        Create a new model by parsing and validating input data from keyword arguments.
+    
+        Raises ValidationError if the input data cannot be parsed to form a valid model.
+        """
+        # Uses something other than `self` the first arg to allow "self" as a settable attribute
+        values, fields_set, validation_error = validate_model(__pydantic_self__.__class__, data)
+        if validation_error:
+&gt;           raise validation_error
+E           pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/pydantic/v1/main.py:341: ValidationError</failure></testcase><testcase classname="tests.test_world_methods.TestWorldMethods" name="test_generate_world_integration" time="0.013"><failure message="pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)&#10;llm&#10;  instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)">self = &lt;tests.test_world_methods.TestWorldMethods object at 0xffffa2fe1840&gt;
+
+    def test_generate_world_integration(self):
+        """Test generate_world() method creates a complete world model."""
+        with patch('llm.generators.base.ChatOpenAI') as mock_chat:
+            # Setup mocks
+            mock_chat.return_value = MagicMock()
+    
+            # Import inside test to use mocks
+            from llm.world import World
+    
+            # Create a sample world model for the mock return
+            test_world_model = WorldModel(
+                theme="Dark Fantasy",
+                title="Shadow Realm",
+                plot="A dark adventure awaits.",
+                mechanics=GameMechanics(mechanics=[
+                    {"name": "Combat", "description": "Fighting monsters"}
+                ]),
+                items=Items(items=[
+                    {"name": "Sword", "ascii_symbol": "/", "description": "A weapon"}
+                ]),
+                global_entities={
+                    "player": {"entity_id": "player", "name": "Player", "x": 0, "y": 0}
+                }
+            )
+    
+            # Create world instance and mock generator method
+&gt;           world = World(None)
+
+tests/test_world_methods.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+llm/world.py:35: in __init__
+    self.generator = WorldGenerator(api_key=api_key)
+llm/generators/world_generator.py:40: in __init__
+    self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
+llm/generators/mechanics_generator.py:29: in __init__
+    self.gm_parser = OutputFixingParser.from_llm(
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain/output_parsers/fix.py:51: in from_llm
+    chain = LLMChain(llm=llm, prompt=prompt)
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/langchain_core/load/serializable.py:120: in __init__
+    super().__init__(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+__pydantic_self__ = LLMChain()
+data = {'llm': &lt;MagicMock name='ChatOpenAI()' id='281473413679712'&gt;, 'prompt': PromptTemplate(input_variables=['completion', ...n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:')}
+values = {'callback_manager': None, 'callbacks': None, 'llm_kwargs': {}, 'memory': None, ...}
+fields_set = {'llm', 'prompt'}
+validation_error = ValidationError(model='LLMChain', errors=[{'loc': ('llm',), 'msg': 'instance of Runnable expected', 'type': 'type_erro...'instance of Runnable expected', 'type': 'type_error.arbitrary_type', 'ctx': {'expected_arbitrary_type': 'Runnable'}}])
+
+    def __init__(__pydantic_self__, **data: Any) -&gt; None:
+        """
+        Create a new model by parsing and validating input data from keyword arguments.
+    
+        Raises ValidationError if the input data cannot be parsed to form a valid model.
+        """
+        # Uses something other than `self` the first arg to allow "self" as a settable attribute
+        values, fields_set, validation_error = validate_model(__pydantic_self__.__class__, data)
+        if validation_error:
+&gt;           raise validation_error
+E           pydantic.v1.error_wrappers.ValidationError: 2 validation errors for LLMChain
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+E           llm
+E             instance of Runnable expected (type=type_error.arbitrary_type; expected_arbitrary_type=Runnable)
+
+../../../../agent-tmp/poetry-envs/airogue-u70Vej-w-py3.10/lib/python3.10/site-packages/pydantic/v1/main.py:341: ValidationError</failure></testcase></testsuite></testsuites>
