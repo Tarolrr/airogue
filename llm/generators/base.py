@@ -3,7 +3,7 @@ Base generator classes for content generation.
 These classes provide the foundation for all specialized generators.
 """
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -12,7 +12,9 @@ from langchain_core.prompts import ChatPromptTemplate
 class BaseGenerator(ABC):
     """Base class for all content generators."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0,
+                 provider: Literal["openai", "codex"] = "openai", codex_command: str = "codex",
+                 codex_timeout: float = 60.0, codex_model: Optional[str] = None):
         """
         Initialize the base generator.
         
@@ -24,6 +26,14 @@ class BaseGenerator(ABC):
         self.model_name = model
         self.temperature = temperature
         self.api_key = api_key
+        if provider not in ("openai", "codex"):
+            raise ValueError("provider must be 'openai' or 'codex'")
+        if provider == "codex" and temperature != 1.0:
+            raise ValueError("temperature is not supported by the Codex backend")
+        self.provider = provider
+        self.codex_command = codex_command
+        self.codex_timeout = codex_timeout
+        self.codex_model = codex_model
         # The LLM will be initialized when needed, not at creation time
         self._llm = None
         
@@ -31,6 +41,10 @@ class BaseGenerator(ABC):
     def llm(self):
         """Lazy initialization of the LLM to avoid unnecessary API key checks."""
         if self._llm is None:
+            if self.provider == "codex":
+                from llm.providers.codex_app_server import CodexAppServer
+                self._llm = CodexAppServer(self.codex_command, self.codex_timeout, self.codex_model)
+                return self._llm
             kwargs = {
                 "model": self.model_name, 
                 "temperature": self.temperature
@@ -41,6 +55,16 @@ class BaseGenerator(ABC):
             self._llm = ChatOpenAI(**kwargs)
             
         return self._llm
+
+    def close(self) -> None:
+        if self._llm is not None and hasattr(self._llm, "close"):
+            self._llm.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        self.close()
         
     def create_prompt(self, template_messages):
         """

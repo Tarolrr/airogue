@@ -3,7 +3,7 @@ World generator module that provides functionality for generating game worlds.
 This module orchestrates the generation process using specialized generators
 for themes, plots, mechanics, and items.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from .base import BaseGenerator
 from .theme_generator import ThemeGenerator
@@ -21,7 +21,9 @@ class WorldGenerator(BaseGenerator):
     """Generator for complete game worlds including theme, plot, mechanics and items.
     This class orchestrates the generation process using specialized generators."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0,
+                 provider: Literal["openai", "codex"] = "openai", codex_command: str = "codex",
+                 codex_timeout: float = 60.0, codex_model: Optional[str] = None):
         """
         Initialize the world generator.
         
@@ -30,15 +32,34 @@ class WorldGenerator(BaseGenerator):
             model: The OpenAI model to use.
             temperature: Temperature for generation (0.0 to 2.0).
         """
-        super().__init__(api_key, model, temperature)
+        super().__init__(api_key, model, temperature, provider, codex_command, codex_timeout, codex_model)
         self.design_doc = ""
         
         # Initialize component generators
-        self.theme_generator = ThemeGenerator(api_key, model, temperature)
-        self.title_generator = TitleGenerator(api_key, model, temperature)
-        self.plot_generator = PlotGenerator(api_key, model, temperature)
-        self.mechanics_generator = MechanicsGenerator(api_key, model, temperature)
-        self.item_generator = ItemGenerator(api_key, model, temperature)
+        child_options = (api_key, model, temperature, provider, codex_command, codex_timeout, codex_model)
+        self.theme_generator = ThemeGenerator(*child_options)
+        self.title_generator = TitleGenerator(*child_options)
+        self.plot_generator = PlotGenerator(*child_options)
+        self.mechanics_generator = MechanicsGenerator(*child_options)
+        self.item_generator = ItemGenerator(*child_options)
+
+    def close(self) -> None:
+        """Close every child even if one backend reports a cleanup error."""
+        errors = []
+        for generator in (self.theme_generator, self.title_generator, self.plot_generator,
+                          self.mechanics_generator, self.item_generator, self):
+            if generator is self:
+                try:
+                    super().close()
+                except Exception as exc:
+                    errors.append(exc)
+                continue
+            try:
+                generator.close()
+            except Exception as exc:
+                errors.append(exc)
+        if errors:
+            raise errors[0]
     
     def generate_themes(self) -> Dict[str, List[str]]:
         """

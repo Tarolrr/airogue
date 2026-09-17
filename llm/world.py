@@ -5,7 +5,7 @@ It uses the same interface as the original World class but delegates to the
 WorldGenerator class for the actual generation logic.
 """
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from colored import attr, fg
 
@@ -20,7 +20,10 @@ class World:
     delegates to the WorldGenerator class for the actual generation logic.
     """
     
-    def __init__(self, setting: Any, api_key: Optional[str] = None):
+    def __init__(self, setting: Any, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14",
+                 temperature: float = 1.0, provider: Literal["openai", "codex"] = "openai",
+                 codex_command: str = "codex", codex_timeout: float = 60.0,
+                 codex_model: Optional[str] = None):
         """Initialize the World generator.
         
         Args:
@@ -32,11 +35,18 @@ class World:
         self.design_doc = ""
         
         # Create the actual generator
-        self.generator = WorldGenerator(api_key=api_key)
-        
-        # For logging purposes
-        if hasattr(self.generator.llm, "__str__"):
-            print(self.generator.llm)
+        self.generator = WorldGenerator(api_key=api_key, model=model, temperature=temperature,
+                                        provider=provider, codex_command=codex_command,
+                                        codex_timeout=codex_timeout, codex_model=codex_model)
+
+    def close(self) -> None:
+        self.generator.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        self.close()
 
     def theme(self) -> str:
         """Generate a theme for the game.

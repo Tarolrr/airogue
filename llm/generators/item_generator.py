@@ -2,19 +2,19 @@
 Item generator module that provides functionality for generating game items.
 This extracts item generation from the original WorldGenerator into a focused component.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
-from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
 from langchain_core.output_parsers import JsonOutputParser
 
 from .base import BaseGenerator
-from ..models import Items
 
 
 class ItemGenerator(BaseGenerator):
     """Generator for game items based on mechanics."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0,
+                 provider: Literal["openai", "codex"] = "openai", codex_command: str = "codex",
+                 codex_timeout: float = 60.0, codex_model: Optional[str] = None):
         """
         Initialize the item generator.
         
@@ -23,13 +23,7 @@ class ItemGenerator(BaseGenerator):
             model: The OpenAI model to use.
             temperature: Temperature for generation (0.0 to 2.0).
         """
-        super().__init__(api_key, model, temperature)
-        
-        # Initialize parser
-        self.item_parser = OutputFixingParser.from_llm(
-            llm=self.llm,
-            parser=PydanticOutputParser(pydantic_object=Items)
-        )
+        super().__init__(api_key, model, temperature, provider, codex_command, codex_timeout, codex_model)
     
     def generate(self, mechanics: List[Dict[str, str]]) -> List[Dict[str, Any]]:
         """

@@ -50,7 +50,11 @@ class TestLLMWorldGeneration:
 
         assert world.setting == "fantasy"
         assert world.setting_details == ""
-        world_generator.assert_called_once_with(api_key="test-key")
+        world_generator.assert_called_once_with(
+            api_key="test-key", model="gpt-4.1-nano-2025-04-14",
+            temperature=1.0, provider="openai", codex_command="codex",
+            codex_timeout=60.0, codex_model=None,
+        )
 
     def test_world_generation_delegates_to_generator(self):
         with patch("llm.world.WorldGenerator") as world_generator:

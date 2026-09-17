@@ -10,7 +10,15 @@ poetry run python -m llm.generators.cli --help
 poetry run flake8 . --select=E9,F63,F7,F82 --exclude=.git,.venv,scratch.py,game/pipeline.py,game/slots.py,llm/models.py
 ```
 
-Обычный набор запрещает socket-соединения до collection и не использует API-ключ. Реальные API-проверки в `test_world_generator_e2e.py` помечены `requires_openai_api` и выполняются только при явном `--run-requires-openai-api`; это ручной, потенциально платный запуск, не часть CI.
+Обычный набор запрещает socket-соединения до collection и не использует API-ключ. Он также не запускает реальный Codex App Server и не читает `CODEX_ACCESS_TOKEN`: JSON-RPC transport проверяется через fake `Popen`/stdio. Реальные API-проверки в `test_world_generator_e2e.py` помечены `requires_openai_api` и выполняются только при явном `--run-requires-openai-api`; это ручной, потенциально платный запуск, не часть CI.
+
+Подписочный Codex backend проверяется вручную только на доверенной машине, где владелец уже завершил интерактивный `codex login`:
+
+```bash
+poetry run python -m llm.generators.cli --provider codex --output world_model.json
+```
+
+Не запускайте эту команду в CI: она может расходовать subscription quota. Backend `openai` использует Platform API billing; backend `codex` использует уже аутентифицированный локальный Codex client.
 
 `test_game_startup.py` запускает настоящий `main.main()` с реальными `Registry`, `InGame` и offscreen `Console`. Он заменяет только загрузку неподготовленного мира, оконный context и очередь событий, затем проверяет кадр, Quit и cleanup. Это не интеграционный тест `new_world()` и сериализованного мира: этот путь по-прежнему требует локальный `world_model.json` и незавершённые signals/slots.
 
@@ -19,6 +27,7 @@ poetry run flake8 . --select=E9,F63,F7,F82 --exclude=.git,.venv,scratch.py,game/
 | Файлы | Область проверки |
 | --- | --- |
 | `test_cli.py` | Импорт CLI, вызов генератора и разбор аргументов с моками |
+| `test_codex_app_server.py` | Offline handshake, terminal output и isolation policy Codex App Server |
 | `test_theme_generator.py` | Генерация тем с моками |
 | `test_world_methods.py` | Методы обёртки `World` |
 | `test_world_generation_isolation.py` | Модели, JSON и изолированная обёртка `World` |

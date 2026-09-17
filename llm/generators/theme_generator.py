@@ -2,7 +2,7 @@
 Theme generator module that provides functionality for generating game themes.
 This extracts theme generation from the original WorldGenerator into a focused component.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 import random
@@ -21,7 +21,9 @@ class SelectRandomThemeParser(JsonOutputParser):
 class ThemeGenerator(BaseGenerator):
     """Generator for game themes."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0,
+                 provider: Literal["openai", "codex"] = "openai", codex_command: str = "codex",
+                 codex_timeout: float = 60.0, codex_model: Optional[str] = None):
         """
         Initialize the theme generator.
         
@@ -30,7 +32,7 @@ class ThemeGenerator(BaseGenerator):
             model: The OpenAI model to use.
             temperature: Temperature for generation (0.0 to 2.0).
         """
-        super().__init__(api_key, model, temperature)
+        super().__init__(api_key, model, temperature, provider, codex_command, codex_timeout, codex_model)
         
         # Initialize parsers
         self.theme_parser = SelectRandomThemeParser()
