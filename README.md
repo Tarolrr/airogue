@@ -20,7 +20,7 @@ poetry run python -m llm.generators.cli --help
 
 ## Генерация мира
 
-CLI читает `OPENAI_API_KEY` из окружения, локального `.env`, файла `~/.airogue.env` или файла, указанного через `--env-file`. Локальный `.env` исключён из Git. Не добавляйте ключи в исходники, коммиты или логи.
+По умолчанию CLI использует backend `openai`: он читает `OPENAI_API_KEY` из окружения, локального `.env`, файла `~/.airogue.env` или файла, указанного через `--env-file`. Локальный `.env` исключён из Git. Не добавляйте ключи в исходники, коммиты или логи.
 
 После настройки ключа:
 
@@ -29,6 +29,18 @@ poetry run python -m llm.generators.cli --output world_model.json
 ```
 
 Это реальный запрос к внешнему API, который может быть платным. CLI также поддерживает `--temperature`; полный список параметров доступен через `--help`. Модель по умолчанию задаётся в `llm/generators/base.py` и `world_generator.py`; доступность модели зависит от аккаунта и здесь не гарантируется. Генерация и сохранение могут завершиться ошибкой из-за незавершённых контрактов данных — см. [ревью](docs/INITIAL_REVIEW.md).
+
+### Локальный Codex backend
+
+Явный opt-in `--provider codex` использует локальный experimental `codex app-server`, а не OpenAI Platform API. Он не требует `OPENAI_API_KEY` и не выполняет OAuth: на доверенной машине владелец заранее устанавливает Codex и интерактивно завершает `codex login`. Затем можно выполнить:
+
+```bash
+poetry run python -m llm.generators.cli --provider codex --output world_model.json
+```
+
+ChatGPT/Codex subscription применяется к клиенту Codex; API key backend тарифицируется как Platform API и не становится subscription usage. App Server запускается только при первой генерации, получает свежий temporary working directory, restricted read-only policy, отключённую сеть и `never` approvals. Он не должен использоваться на недоверенной машине. `CODEX_ACCESS_TOKEN`, если он настроен внешним secret store для локальной автоматизации, остаётся секретом: не помещайте его в `.env`, исходники или Git.
+
+Поддерживается минимум Codex CLI 0.153.4. App Server — experimental protocol; несовместимый CLI, login, лимит или policy завершаются диагностикой без fallback к API key. Ручная команда выше может расходовать subscription quota и не запускается тестами или CI.
 
 ## Игровой запуск и ограничения
 

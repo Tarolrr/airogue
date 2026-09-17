@@ -85,7 +85,8 @@ class TestCliTool(unittest.TestCase):
                 
             # Verify WorldGenerator was called with correct parameters
             mock_world_generator.assert_called_once_with(
-                api_key="test_key", temperature=1.0
+                api_key="test_key", temperature=1.0, provider="openai",
+                codex_command="codex", codex_timeout=60.0
             )
             mock_generator_instance.generate.assert_called_once()
             
@@ -107,6 +108,9 @@ class TestCliTool(unittest.TestCase):
         mock_args.output = "test_output.json"
         mock_args.temperature = 1.0
         mock_args.env_file = None
+        mock_args.provider = "openai"
+        mock_args.codex_command = "codex"
+        mock_args.codex_timeout = 60.0
         mock_parse_args.return_value = mock_args
         
         # Call the main function
@@ -118,9 +122,28 @@ class TestCliTool(unittest.TestCase):
         # Verify generate_world was called with the correct arguments
         # The actual implementation in cli.py uses positional arguments
         mock_generate_world.assert_called_once_with(
-            "test_api_key", 
-            "test_output.json",
-            1.0,
+            api_key="test_api_key", output_path="test_output.json", temperature=1.0,
+            provider="openai", codex_command="codex", codex_timeout=60.0,
+        )
+
+    @patch('llm.generators.cli.shutil.which', return_value='/usr/bin/codex')
+    @patch('llm.generators.cli.generate_world')
+    @patch('llm.generators.cli.setup_environment')
+    @patch('argparse.ArgumentParser.parse_args')
+    def test_codex_provider_does_not_require_api_key(self, mock_parse_args, mock_setup_env,
+                                                      mock_generate_world, mock_which):
+        from llm.generators import cli
+
+        mock_parse_args.return_value = MagicMock(
+            provider="codex", api_key=None, output="world.json", temperature=1.0,
+            env_file=None, codex_command="codex", codex_timeout=10.0,
+        )
+
+        assert cli.main() == 0
+        mock_setup_env.assert_not_called()
+        mock_generate_world.assert_called_once_with(
+            api_key=None, output_path="world.json", temperature=1.0, provider="codex",
+            codex_command="codex", codex_timeout=10.0,
         )
 
     @patch('subprocess.run')

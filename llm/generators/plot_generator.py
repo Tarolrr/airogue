@@ -2,7 +2,7 @@
 Plot generator module that provides functionality for generating game plots.
 This extracts plot generation from the original WorldGenerator into a focused component.
 """
-from typing import Optional
+from typing import Literal, Optional
 
 from langchain_core.output_parsers import StrOutputParser
 
@@ -12,7 +12,9 @@ from .base import BaseGenerator
 class PlotGenerator(BaseGenerator):
     """Generator for game plots based on themes and titles."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1-nano-2025-04-14", temperature: float = 1.0,
+                 provider: Literal["openai", "codex"] = "openai", codex_command: str = "codex",
+                 codex_timeout: float = 60.0, codex_model: Optional[str] = None):
         """
         Initialize the plot generator.
         
@@ -21,7 +23,7 @@ class PlotGenerator(BaseGenerator):
             model: The OpenAI model to use.
             temperature: Temperature for generation (0.0 to 2.0).
         """
-        super().__init__(api_key, model, temperature)
+        super().__init__(api_key, model, temperature, provider, codex_command, codex_timeout, codex_model)
     
     def generate(self, theme: str, title: str) -> str:
         """
