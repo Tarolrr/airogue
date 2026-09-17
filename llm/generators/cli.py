@@ -8,7 +8,10 @@ import sys
 import json
 import argparse
 from typing import Optional
-import dotenv
+try:
+    import dotenv
+except ImportError:  # python-dotenv is not a direct project dependency.
+    dotenv = None
 
 # Handle imports for both package import and direct execution
 try:
@@ -24,16 +27,31 @@ except ImportError:
     from llm.generators.world_generator import WorldGenerator
 
 
+def load_environment_file(path: str) -> None:
+    """Load a simple ``KEY=VALUE`` environment file without extra packages."""
+    if dotenv is not None:
+        dotenv.load_dotenv(path)
+        return
+
+    with open(path, encoding="utf-8") as env_file:
+        for line in env_file:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
+
+
 def setup_environment():
     """Load environment variables from .env file if it exists."""
     # First try to load from a .env file in the current directory
     if os.path.exists(".env"):
-        dotenv.load_dotenv()
+        load_environment_file(".env")
     
     # Also check for a .env file in the user's home directory
     home_env = os.path.join(os.path.expanduser("~"), ".airogue.env")
     if os.path.exists(home_env):
-        dotenv.load_dotenv(home_env)
+        load_environment_file(home_env)
 
 
 def generate_world(api_key: Optional[str] = None, output_path: Optional[str] = None, temperature: float = 1.0):
@@ -89,7 +107,7 @@ def main():
     
     # Load from specific env file if provided
     if args.env_file and os.path.exists(args.env_file):
-        dotenv.load_dotenv(args.env_file)
+        load_environment_file(args.env_file)
     
     # Get API key with precedence: command line > environment variable
     api_key = args.api_key or os.environ.get("OPENAI_API_KEY")

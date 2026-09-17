@@ -2,7 +2,7 @@
 Tests for the theme generator module.
 """
 import unittest
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 
 from llm.generators.theme_generator import ThemeGenerator, SelectRandomThemeParser
 
@@ -10,70 +10,49 @@ from llm.generators.theme_generator import ThemeGenerator, SelectRandomThemePars
 class TestThemeGenerator(unittest.TestCase):
     """Test cases for ThemeGenerator."""
     
-    @patch("llm.generators.theme_generator.BaseGenerator.llm", new_callable=PropertyMock)
-    @patch("llm.generators.theme_generator.BaseGenerator.create_prompt")
-    @patch("llm.generators.theme_generator.BaseGenerator.__init__", return_value=None)
-    def test_generate_single(self, mock_init, mock_create_prompt, mock_llm_prop):
+    def test_generate_single_strips_chain_result(self):
         """Test generate_single method."""
-        # Setup
-        mock_llm = MagicMock()
-        mock_llm_prop.return_value = mock_llm
         mock_chain = MagicMock()
-        mock_chain.invoke.return_value = "Test theme"
+        mock_chain.invoke.return_value = "  Test theme  "
         mock_prompt = MagicMock()
-        mock_create_prompt.return_value = mock_prompt
-        
-        # Create the generator
         generator = ThemeGenerator()
-        
-        # Mock the pipe operation
+        generator.create_prompt = MagicMock(return_value=mock_prompt)
+        generator._llm = MagicMock()
         mock_prompt.__or__.return_value = MagicMock()
         mock_prompt.__or__.return_value.__or__ = MagicMock(return_value=mock_chain)
-        
-        # Call the method
+
         result = generator.generate_single()
-        
-        # Verify
-        mock_create_prompt.assert_called_once()
+
+        generator.create_prompt.assert_called_once()
+        mock_chain.invoke.assert_called_once_with({})
         self.assertEqual(result, "Test theme")
-        
+
     @patch("llm.generators.theme_generator.random.choice")
-    @patch("llm.generators.theme_generator.JsonOutputParser")
-    @patch("llm.generators.theme_generator.BaseGenerator.llm", new_callable=PropertyMock)
-    @patch("llm.generators.theme_generator.BaseGenerator.create_prompt")
-    @patch("llm.generators.theme_generator.BaseGenerator.__init__", return_value=None)
-    def test_generate(self, mock_init, mock_create_prompt, mock_llm_prop, mock_json_parser, mock_choice):
-        """Test generate method."""
-        # Setup
-        mock_llm = MagicMock()
-        mock_llm_prop.return_value = mock_llm
-        
-        # Set up the JSON parser mock
-        mock_parser_instance = MagicMock()
-        mock_json_parser.return_value = mock_parser_instance
-        
-        # Set up the chain mocking
-        mock_chain = MagicMock()
-        mock_chain.invoke.return_value = {"themes": ["Theme 1", "Theme 2"]}
-        mock_prompt = MagicMock()
-        mock_create_prompt.return_value = mock_prompt
-        
-        # Mock the random choice to return a fixed theme
+    def test_parser_selects_theme_from_valid_json(self, mock_choice):
+        parser = SelectRandomThemeParser()
         mock_choice.return_value = "Theme 1"
-        
-        # Mock the pipe operation
+
+        result = parser.parse('{"themes": ["Theme 1", "Theme 2"]}')
+
+        mock_choice.assert_called_once_with(["Theme 1", "Theme 2"])
+        self.assertEqual(result, "Theme 1")
+
+    def test_generate_delegates_to_theme_parser(self):
+        mock_chain = MagicMock()
+        mock_chain.invoke.return_value = "Theme 1"
+        mock_prompt = MagicMock()
+        mock_parser = MagicMock()
+        generator = ThemeGenerator()
+        generator.create_prompt = MagicMock(return_value=mock_prompt)
+        generator._llm = MagicMock()
+        generator.theme_parser = mock_parser
         mock_prompt.__or__.return_value = MagicMock()
         mock_prompt.__or__.return_value.__or__ = MagicMock(return_value=mock_chain)
-        
-        # Create the generator
-        generator = ThemeGenerator()
-        
-        # Call the method
+
         result = generator.generate()
-        
-        # Verify
-        mock_create_prompt.assert_called_once()
-        mock_choice.assert_called_once_with(["Theme 1", "Theme 2"])
+
+        generator.create_prompt.assert_called_once()
+        mock_chain.invoke.assert_called_once_with({})
         self.assertEqual(result, "Theme 1")
 
 

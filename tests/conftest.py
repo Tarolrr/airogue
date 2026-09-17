@@ -63,8 +63,7 @@ def sample_item():
     return Item(
         name="Shadow Blade",
         description="A sword that drains life force",
-        symbol="†",
-        properties={"damage": 15, "life_drain": 3}
+        ascii_symbol="/",
     )
 
 # Mock fixtures for LLM testing
@@ -85,23 +84,6 @@ def mock_openai_response():
             }
         }]
     }
-
-# Validation fixtures
-@pytest.fixture
-def content_validator():
-    """ContentValidator instance for testing"""
-    from utils.validation import ContentValidator
-    return ContentValidator()
-
-# Integration test fixtures
-@pytest.fixture
-def test_world():
-    """Test World instance with mocked LLM"""
-    from llm.world import World
-    world = World("test")
-    # Mock the LLM to avoid API calls in tests
-    world.llm = Mock()
-    return world
 
 @pytest.fixture
 def game_entities():
